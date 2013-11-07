@@ -17,6 +17,9 @@ enum gamePieces
   PINK_PIECE
 };
 
+int allowSnapshot=1;
+int allowMouseControl=1;
+
 unsigned int clickdelay = 100*1000;
 unsigned int delay = 10*1000;
 
@@ -42,6 +45,9 @@ int writePieceChar(int pieceVal)
     case BLUE_PIECE : fprintf(stderr,CYAN " B" NORMAL);  break;
     case RED_PIECE : fprintf(stderr,RED " R" NORMAL);  break;
     case PINK_PIECE : fprintf(stderr,MAGENTA " P" NORMAL);  break;
+    default :
+     fprintf(stderr," ?" );
+    break;
   }
 
   return 0;
@@ -257,6 +263,7 @@ int suggestMove(unsigned int table[8][8] , unsigned int *fromX,unsigned int *fro
 
 int executeClickAndClick( unsigned int fromPixelX,unsigned int fromPixelY , unsigned int toPixelX, unsigned int toPixelY)
 {
+  if (!allowSnapshot) { return 0; }
   if ( (fromPixelX==toPixelX)  && (fromPixelY==toPixelY) ) { fprintf(stderr,"Doing nothing\n"); usleep(1*1000*1000); return 0; }
   fprintf(stderr,"executeClickAndClick %u,%u -> %u,%u \n",fromPixelX,fromPixelY,toPixelX,toPixelY);
 
@@ -278,6 +285,7 @@ int executeClickAndClick( unsigned int fromPixelX,unsigned int fromPixelY , unsi
 
 int reloadScreen()
 {
+  if (!allowMouseControl) { return 0; }
   fprintf(stderr,"reloadScreen\n");
   char commandStr[512]={0};
   sprintf(commandStr,"xwd -root -out out.xwd && convert out.xwd screenshot.pnm");
@@ -333,12 +341,17 @@ int main()
 
     unsigned char R ,  G  , B;
     unsigned int clientX = resX , clientY = resY + needle->height;
-
-
     unsigned int blockX = 48,  blockY = 48;
+    unsigned int offsetX=0 , offsetY=0;
+
+
+    clientX = 337; clientY = 382;
+    blockX = 40;  blockY = 40;
+    offsetX=0; offsetY=3;
+
     unsigned int halfBlockX = blockX/2,  halfBlockY = blockY/2;
 
-    unsigned int threshold = 26;
+    unsigned int threshold = 30;
     unsigned int table[8][8]={0};
     unsigned int x,y=0;
 
@@ -350,9 +363,9 @@ int main()
     {
      for (x=0; x<8; x++)
      {
-       getRGBPixel(haystack->pixels,haystack->width,haystack->height, clientX + x*blockX + halfBlockX , clientY + y*blockY + halfBlockY , &R , &G , &B );
+       getRGBPixel(haystack->pixels,haystack->width,haystack->height, clientX + offsetX + x*blockX + halfBlockX , clientY + offsetY + y*blockY + halfBlockY , &R , &G , &B );
        fprintf(stderr,"Pos(%u,%u) = %u , %u , %u \n",x,y,R,G,B);
-
+       /*
        if ( closeToRGB(R,G,B, 0, 166 , 0 ,threshold)     )      { table[x][y]=GREEN_PIECE; }  else
        if ( closeToRGB(R,G,B, 200, 200 , 200 ,threshold) )      { table[x][y]=WHITE_PIECE; }  else
        if ( closeToRGB(R,G,B, 175, 63, 5 ,threshold)     )      { table[x][y]=ORANGE_PIECE; } else
@@ -360,6 +373,15 @@ int main()
        if ( closeToRGB(R,G,B, 0, 189, 249 ,threshold)    )      { table[x][y]=BLUE_PIECE; } else
        if ( closeToRGB(R,G,B, 213, 95, 115 ,threshold)     )      { table[x][y]=RED_PIECE; } else
        if ( closeToRGB(R,G,B, 175, 0, 174 ,threshold)    )      { table[x][y]=PINK_PIECE; }
+      */
+
+       if ( closeToRGB(R,G,B, 24, 176 , 44 ,threshold)     )      { table[x][y]=GREEN_PIECE; }  else
+       if ( closeToRGB(R,G,B, 238, 238 , 238 ,threshold) )       { table[x][y]=WHITE_PIECE; }  else
+       if ( closeToRGB(R,G,B, 216, 79, 24 ,threshold)     )      { table[x][y]=ORANGE_PIECE; } else
+       if ( closeToRGB(R,G,B, 254, 254, 39 ,threshold)    )      { table[x][y]=YELLOW_PIECE; } else
+       if ( closeToRGB(R,G,B, 13, 139, 254 ,threshold)    )      { table[x][y]=BLUE_PIECE; } else
+       if ( closeToRGB(R,G,B, 254, 32, 63 ,threshold)     )      { table[x][y]=RED_PIECE; } else
+       if ( closeToRGB(R,G,B, 254, 17, 254,threshold)    )       { table[x][y]=PINK_PIECE; }
 
      }
     }
@@ -369,12 +391,12 @@ int main()
     fprintf(stderr,"----------------------------------\n");
      for (y=0; y<8; y++)
      {
-       fprintf(stderr,"        ");
+       fprintf(stderr,"        |");
        for (x=0; x<8; x++)
        {
         writePieceChar(table[x][y]);
        }
-       fprintf(stderr,"\n");
+       fprintf(stderr,"|\n");
      }
     fprintf(stderr,"----------------------------------\n");
 
