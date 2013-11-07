@@ -280,7 +280,7 @@ int reloadScreen()
 {
   fprintf(stderr,"reloadScreen\n");
   char commandStr[512]={0};
-  sprintf(commandStr,"./xwd -root -out out.xwd && convert out.xwd screenshot.pnm");
+  sprintf(commandStr,"xwd -root -out out.xwd && convert out.xwd screenshot.pnm");
   int i = system(commandStr);
 
   return (i==0);

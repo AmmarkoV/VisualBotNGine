@@ -1,0 +1,6 @@
+A small project that allows to create bots that can play autonomously desktop games like gweled and score high scores for me , so I can concentrate in more important stuff..
+
+
+The project is GPL , linux only , and uses XServer as the back end for using the mouse and acquiring the screen information ( xdotool , xwd )   
+
+ 
