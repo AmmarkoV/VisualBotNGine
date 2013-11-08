@@ -13,8 +13,8 @@ int allowSnapshot=1;
 int allowMouseControl=1;
 
 
-unsigned int clickdelay = 40*1000;
-unsigned int delay = 50*1000;
+unsigned int clickdelay = 50*1000;
+unsigned int delay = 0*1000;
 
 
 void countdownDelay(int seconds)
@@ -40,17 +40,18 @@ int executeClickAndClick( unsigned int fromPixelX,unsigned int fromPixelY , unsi
   if ( (fromPixelX==toPixelX)  && (fromPixelY==toPixelY) ) { fprintf(stderr,"Doing nothing\n"); usleep(1*1000*1000); return 0; }
   fprintf(stderr,"executeClickAndClick %u,%u -> %u,%u \n",fromPixelX,fromPixelY,toPixelX,toPixelY);
 
+
+
   char commandStr[512];
   sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",fromPixelX,fromPixelY);
   int i = system(commandStr);
 
-  fprintf(stderr,"Step1 Done \n");
+  fprintf(stderr,"Moving : From OK .. ");
   usleep(clickdelay);
 
   sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",toPixelX,toPixelY);
   i = system(commandStr);
-  fprintf(stderr,"Step2 Done \n");
-
+  fprintf(stderr,"To OK \n");
 
   return 1;
 }
@@ -113,17 +114,26 @@ int main(int argc, char *argv[])
       fprintf(stderr,"Round %u \n",iterations);
       ++iterations;
 
-      thinkWhatToPlay(
-                       haystack->pixels,  haystack->width , haystack->height ,
-                       resX , resY ,
-                       &fromX , &fromY , &toX , &toY
-                      );
+      int i=0;
+      for (i=0; i<3; i++)
+      {
+          unsigned int  possibleMoves= thinkWhatToPlay(
+                                                        haystack->pixels,  haystack->width , haystack->height ,
+                                                        resX , resY ,
+                                                        &fromX , &fromY , &toX , &toY
+                                                      );
+
+       if ( possibleMoves==0 )
+          { fprintf(stderr,"Can't think of a move to play\n"); break;  }
+            else
+          {
+           fprintf(stderr,"Moving From %u,%u to %u,%u ", fromX , fromY , toX , toY );
+           executeClickAndClick( fromX , fromY , toX , toY  );
+         }
 
 
-
-      fprintf(stderr,"Moving From %u,%u to %u,%u ", fromX , fromY , toX , toY );
-      executeClickAndClick( fromX , fromY , toX , toY  );
-
+        if (possibleMoves<3) { break;}
+      }
 
       usleep(delay);
       reloadScreen();

@@ -50,6 +50,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../ImageOperations/patchComparison.h" />
+		<Unit filename="../MouseMovementDescriptor.h" />
 		<Unit filename="Gweled.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />

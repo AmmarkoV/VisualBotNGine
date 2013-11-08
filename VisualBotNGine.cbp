@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="-doNotMove -doNotGrab " />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -20,6 +21,7 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="-doNotMove -doNotGrab " />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
@@ -61,6 +63,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Codecs/ppmInput.h" />
+		<Unit filename="Engines/MouseMovementDescriptor.h" />
 		<Unit filename="ImageOperations/findSubImage.c">
 			<Option compilerVar="CC" />
 		</Unit>
