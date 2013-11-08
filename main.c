@@ -313,8 +313,19 @@ void countdownDelay(int seconds)
 
 
 
-int main()
+int main(int argc, char *argv[])
 {
+
+int i=0;
+  for (i=0; i<argc; i++)
+  {
+    if (strcasecmp(argv[i],"-doNotMove")==0) { allowMouseControl=0; fprintf(stderr,"Deactivated mouse control\n"); } else
+    if (strcasecmp(argv[i],"-doNotGrab")==0) { allowSnapshot=0; fprintf(stderr,"Deactivated screen grabbing \n"); } else
+    if (strcasecmp(argv[i],"-clickDelay")==0) { clickdelay=atoi(argv[i+1])*1000; fprintf(stderr,"Set click delay to %u\n",clickdelay); } else
+    if (strcasecmp(argv[i],"-Delay")==0) { delay=atoi(argv[i+1])*1000; fprintf(stderr,"Set delay to %u\n",delay); }
+  }
+
+
     fprintf(stderr,"Please ready your window\n");
     countdownDelay(2);
     fprintf(stderr,"Starting Up\n");
