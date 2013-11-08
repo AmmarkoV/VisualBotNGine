@@ -3,5 +3,5 @@ A small project that allows to create bots that can play autonomously desktop ga
 
 The project is GPL , linux only , and uses XServer as the back end for using the mouse and acquiring the screen information ( xdotool , xwd )   
 
- mount -t tmpfs -o size=200m tmpfs /home/ammar/Documents/Programming/VisualBotNGine/ramfs
+running scripts/makeRAMfs.sh will create a temp ram filesystem to improve performance
 

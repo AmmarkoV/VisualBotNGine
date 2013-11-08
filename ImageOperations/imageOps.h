@@ -38,6 +38,6 @@ int bitBltDepthToFile(  char * name  ,
 
 int getRGBPixel(unsigned char * ptrRGB  , unsigned int RGBwidth , unsigned int RGBheight ,  unsigned int x , unsigned int y , unsigned char * R , unsigned char * G , unsigned char * B);
 
-closeToRGB(unsigned char R , unsigned char G , unsigned char B  ,  unsigned char targetR , unsigned char targetG , unsigned char targetB , unsigned int threshold);
+int closeToRGB(unsigned char R , unsigned char G , unsigned char B  ,  unsigned char targetR , unsigned char targetG , unsigned char targetB , unsigned int threshold);
 
 #endif // PPM_H_INCLUDED
