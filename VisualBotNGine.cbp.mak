@@ -15,7 +15,7 @@ INC =
 CFLAGS = -Wall -fPIC
 RESINC = 
 LIBDIR = 
-LIB = ./Engines/Gweled/libGweledEngine.so
+LIB = ./Engines/Gweled/libGweledEngine.so xwd-1.0.5/libXwdLib.a
 LDFLAGS = -ljpeg -lpng
 
 INC_DEBUG = $(INC)
@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./VisualBotNGine
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/ImageOperations/patchComparison.o $(OBJDIR_DEBUG)/ImageOperations/imageOps.o $(OBJDIR_DEBUG)/ImageOperations/findSubImage.o $(OBJDIR_DEBUG)/Codecs/ppmInput.o $(OBJDIR_DEBUG)/Codecs/codecs.o $(OBJDIR_DEBUG)/Codecs/pngInput.o $(OBJDIR_DEBUG)/Codecs/jpgInput.o $(OBJDIR_DEBUG)/Codecs/jpgExiforient_embed.o $(OBJDIR_DEBUG)/Codecs/jpgExifexternal.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/Codecs/ppmInput.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/ImageOperations/patchComparison.o $(OBJDIR_DEBUG)/ImageOperations/imageOps.o $(OBJDIR_DEBUG)/ImageOperations/findSubImage.o $(OBJDIR_DEBUG)/Codecs/codecs.o $(OBJDIR_DEBUG)/Codecs/pngInput.o $(OBJDIR_DEBUG)/Codecs/jpgInput.o $(OBJDIR_DEBUG)/Codecs/jpgExiforient_embed.o $(OBJDIR_DEBUG)/Codecs/jpgExifexternal.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/ImageOperations/patchComparison.o $(OBJDIR_RELEASE)/ImageOperations/imageOps.o $(OBJDIR_RELEASE)/ImageOperations/findSubImage.o $(OBJDIR_RELEASE)/Codecs/ppmInput.o $(OBJDIR_RELEASE)/Codecs/codecs.o $(OBJDIR_RELEASE)/Codecs/pngInput.o $(OBJDIR_RELEASE)/Codecs/jpgInput.o $(OBJDIR_RELEASE)/Codecs/jpgExiforient_embed.o $(OBJDIR_RELEASE)/Codecs/jpgExifexternal.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/Codecs/ppmInput.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/ImageOperations/patchComparison.o $(OBJDIR_RELEASE)/ImageOperations/imageOps.o $(OBJDIR_RELEASE)/ImageOperations/findSubImage.o $(OBJDIR_RELEASE)/Codecs/codecs.o $(OBJDIR_RELEASE)/Codecs/pngInput.o $(OBJDIR_RELEASE)/Codecs/jpgInput.o $(OBJDIR_RELEASE)/Codecs/jpgExiforient_embed.o $(OBJDIR_RELEASE)/Codecs/jpgExifexternal.o
 
 all: debug release
 
@@ -50,9 +50,9 @@ clean: clean_debug clean_release
 
 before_debug: 
 	test -d . || mkdir -p .
+	test -d $(OBJDIR_DEBUG)/Codecs || mkdir -p $(OBJDIR_DEBUG)/Codecs
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 	test -d $(OBJDIR_DEBUG)/ImageOperations || mkdir -p $(OBJDIR_DEBUG)/ImageOperations
-	test -d $(OBJDIR_DEBUG)/Codecs || mkdir -p $(OBJDIR_DEBUG)/Codecs
 
 after_debug: 
 
@@ -60,6 +60,9 @@ debug: before_debug out_debug after_debug
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) $(LIBDIR_DEBUG) -o $(OUT_DEBUG) $(OBJ_DEBUG)  $(LDFLAGS_DEBUG) $(LIB_DEBUG)
+
+$(OBJDIR_DEBUG)/Codecs/ppmInput.o: Codecs/ppmInput.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Codecs/ppmInput.c -o $(OBJDIR_DEBUG)/Codecs/ppmInput.o
 
 $(OBJDIR_DEBUG)/main.o: main.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.c -o $(OBJDIR_DEBUG)/main.o
@@ -72,9 +75,6 @@ $(OBJDIR_DEBUG)/ImageOperations/imageOps.o: ImageOperations/imageOps.c
 
 $(OBJDIR_DEBUG)/ImageOperations/findSubImage.o: ImageOperations/findSubImage.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ImageOperations/findSubImage.c -o $(OBJDIR_DEBUG)/ImageOperations/findSubImage.o
-
-$(OBJDIR_DEBUG)/Codecs/ppmInput.o: Codecs/ppmInput.c
-	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Codecs/ppmInput.c -o $(OBJDIR_DEBUG)/Codecs/ppmInput.o
 
 $(OBJDIR_DEBUG)/Codecs/codecs.o: Codecs/codecs.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c Codecs/codecs.c -o $(OBJDIR_DEBUG)/Codecs/codecs.o
@@ -94,15 +94,15 @@ $(OBJDIR_DEBUG)/Codecs/jpgExifexternal.o: Codecs/jpgExifexternal.c
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf .
+	rm -rf $(OBJDIR_DEBUG)/Codecs
 	rm -rf $(OBJDIR_DEBUG)
 	rm -rf $(OBJDIR_DEBUG)/ImageOperations
-	rm -rf $(OBJDIR_DEBUG)/Codecs
 
 before_release: 
 	test -d . || mkdir -p .
+	test -d $(OBJDIR_RELEASE)/Codecs || mkdir -p $(OBJDIR_RELEASE)/Codecs
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 	test -d $(OBJDIR_RELEASE)/ImageOperations || mkdir -p $(OBJDIR_RELEASE)/ImageOperations
-	test -d $(OBJDIR_RELEASE)/Codecs || mkdir -p $(OBJDIR_RELEASE)/Codecs
 
 after_release: 
 
@@ -110,6 +110,9 @@ release: before_release out_release after_release
 
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE)  $(LDFLAGS_RELEASE) $(LIB_RELEASE)
+
+$(OBJDIR_RELEASE)/Codecs/ppmInput.o: Codecs/ppmInput.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Codecs/ppmInput.c -o $(OBJDIR_RELEASE)/Codecs/ppmInput.o
 
 $(OBJDIR_RELEASE)/main.o: main.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.c -o $(OBJDIR_RELEASE)/main.o
@@ -122,9 +125,6 @@ $(OBJDIR_RELEASE)/ImageOperations/imageOps.o: ImageOperations/imageOps.c
 
 $(OBJDIR_RELEASE)/ImageOperations/findSubImage.o: ImageOperations/findSubImage.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ImageOperations/findSubImage.c -o $(OBJDIR_RELEASE)/ImageOperations/findSubImage.o
-
-$(OBJDIR_RELEASE)/Codecs/ppmInput.o: Codecs/ppmInput.c
-	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Codecs/ppmInput.c -o $(OBJDIR_RELEASE)/Codecs/ppmInput.o
 
 $(OBJDIR_RELEASE)/Codecs/codecs.o: Codecs/codecs.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c Codecs/codecs.c -o $(OBJDIR_RELEASE)/Codecs/codecs.o
@@ -144,9 +144,9 @@ $(OBJDIR_RELEASE)/Codecs/jpgExifexternal.o: Codecs/jpgExifexternal.c
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf .
+	rm -rf $(OBJDIR_RELEASE)/Codecs
 	rm -rf $(OBJDIR_RELEASE)
 	rm -rf $(OBJDIR_RELEASE)/ImageOperations
-	rm -rf $(OBJDIR_RELEASE)/Codecs
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release
 

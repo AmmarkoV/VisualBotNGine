@@ -38,6 +38,7 @@
 			<Add option="-ljpeg" />
 			<Add option="-lpng" />
 			<Add library="./Engines/Gweled/libGweledEngine.so" />
+			<Add library="xwd-1.0.5/libXwdLib.a" />
 		</Linker>
 		<Unit filename="Codecs/codecs.c">
 			<Option compilerVar="CC" />

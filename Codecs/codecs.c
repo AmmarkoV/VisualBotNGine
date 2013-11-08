@@ -186,7 +186,8 @@ struct Image * createImage( unsigned int width , unsigned int height , unsigned 
 
 int destroyImage(struct Image * img)
 {
+    if (img==0) {return 0; }
     if (img->pixels!=0) { free(img->pixels); img->pixels=0; }
     if (img!=0) { free(img); img=0; }
-    return 0;
+    return 1;
 }

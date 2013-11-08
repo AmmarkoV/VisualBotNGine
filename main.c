@@ -8,6 +8,9 @@
 #include "ImageOperations/imageOps.h"
 
 #include "Engines/Gweled/Gweled.h"
+#include "xwd-1.0.5/XwdLib.h"
+
+#define XWDLIB_BRIDGE 0
 
 int allowSnapshot=1;
 int allowMouseControl=1;
@@ -57,15 +60,23 @@ int executeClickAndClick( unsigned int fromPixelX,unsigned int fromPixelY , unsi
 }
 
 
-int reloadScreen()
+struct Image * reloadScreen(struct Image * lastImg)
 {
-  if (!allowSnapshot) { return 0; }
-  fprintf(stderr,"reloadScreen\n");
-  char commandStr[512]={0};
-  sprintf(commandStr,"xwd -root -out ramfs/out.xwd && convert ramfs/out.xwd ramfs/screenshot.pnm");
-  int i = system(commandStr);
+  destroyImage(lastImg);
 
-  return (i==0);
+  if (!allowSnapshot) { return readImage("ramfs/screenshot.pnm",PNM_CODEC,0); }
+
+  #if XWDLIB_BRIDGE
+    getScreen(unsigned char * frame , unsigned int frameWidth , unsigned int frameHeight);
+  #else
+   fprintf(stderr,"reloadScreen\n");
+   char commandStr[512]={0};
+   sprintf(commandStr,"xwd -root -out ramfs/out.xwd && convert ramfs/out.xwd ramfs/screenshot.pnm");
+   int i = system(commandStr);
+
+   return readImage("ramfs/screenshot.pnm",PNM_CODEC,0);
+  #endif // XWDLIB_BRIDGE
+
 }
 
 
@@ -86,9 +97,9 @@ int main(int argc, char *argv[])
     countdownDelay(0);
     fprintf(stderr,"Starting Up\n");
 
-    reloadScreen();
 
-    struct Image * haystack = readImage("ramfs/screenshot.pnm",PNM_CODEC,0);
+
+    struct Image * haystack = reloadScreen(0);
     struct Image * needle = readImage("seek.pnm",PNM_CODEC,0);
 
     unsigned int resX = 0 , resY = 0;
@@ -136,10 +147,8 @@ int main(int argc, char *argv[])
       }
 
       usleep(delay);
-      reloadScreen();
 
-      destroyImage(haystack);
-      haystack = readImage("ramfs/screenshot.pnm",PNM_CODEC,0);
+      haystack = reloadScreen(haystack);
     }
 
     destroyImage(needle);

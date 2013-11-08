@@ -6,7 +6,10 @@
 WRKDIR = `pwd`
 MAKE = make
 
-all: engines_gweled_gweledengine visualbotngine
+all: xwd_1_0_5_xwdlib engines_gweled_gweledengine visualbotngine
+
+xwd_1_0_5_xwdlib: 
+	$(MAKE) -C xwd-1.0.5 all -f XwdLib.cbp.mak
 
 engines_gweled_gweledengine: 
 	$(MAKE) -C Engines/Gweled all -f GweledEngine.cbp.mak
@@ -14,7 +17,10 @@ engines_gweled_gweledengine:
 visualbotngine: 
 	$(MAKE) all -f VisualBotNGine.cbp.mak
 
-clean: clean_engines_gweled_gweledengine clean_visualbotngine
+clean: clean_xwd_1_0_5_xwdlib clean_engines_gweled_gweledengine clean_visualbotngine
+
+clean_xwd_1_0_5_xwdlib: 
+	$(MAKE) -C xwd-1.0.5 clean -f XwdLib.cbp.mak
 
 clean_engines_gweled_gweledengine: 
 	$(MAKE) -C Engines/Gweled clean -f GweledEngine.cbp.mak
@@ -22,5 +28,5 @@ clean_engines_gweled_gweledengine:
 clean_visualbotngine: 
 	$(MAKE) clean -f VisualBotNGine.cbp.mak
 
-.PHONY: clean_engines_gweled_gweledengine clean_visualbotngine
+.PHONY: clean_xwd_1_0_5_xwdlib clean_engines_gweled_gweledengine clean_visualbotngine
 
