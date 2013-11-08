@@ -20,8 +20,8 @@ enum gamePieces
 int allowSnapshot=1;
 int allowMouseControl=1;
 
-unsigned int clickdelay = 100*1000;
-unsigned int delay = 10*1000;
+unsigned int clickdelay = 50*1000;
+unsigned int delay = 0*1000;
 
 unsigned int lastMoveX=4,lastMoveY=2;
 
@@ -401,7 +401,7 @@ int reloadScreen()
   if (!allowSnapshot) { return 0; }
   fprintf(stderr,"reloadScreen\n");
   char commandStr[512]={0};
-  sprintf(commandStr,"xwd -root -out out.xwd && convert out.xwd screenshot.pnm");
+  sprintf(commandStr,"xwd -root -out ramfs/out.xwd && convert ramfs/out.xwd ramfs/screenshot.pnm");
   int i = system(commandStr);
 
   return (i==0);
@@ -440,12 +440,12 @@ int i=0;
 
 
     fprintf(stderr,"Please ready your window\n");
-    countdownDelay(2);
+    countdownDelay(0);
     fprintf(stderr,"Starting Up\n");
 
     reloadScreen();
 
-    struct Image * haystack = readImage("screenshot.pnm",PNM_CODEC,0);
+    struct Image * haystack = readImage("ramfs/screenshot.pnm",PNM_CODEC,0);
     struct Image * needle = readImage("seek.pnm",PNM_CODEC,0);
 
     unsigned int resX = 0 , resY = 0;
@@ -540,7 +540,7 @@ int i=0;
     reloadScreen();
 
     destroyImage(haystack);
-    haystack = readImage("screenshot.pnm",PNM_CODEC,0);
+    haystack = readImage("ramfs/screenshot.pnm",PNM_CODEC,0);
 
     }
 
