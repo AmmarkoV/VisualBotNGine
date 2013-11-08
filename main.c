@@ -97,16 +97,22 @@ int pickBestMoveOfList(struct solutionList * list ,  unsigned int *fromX,unsigne
   unsigned int i=0;
   for (i=0; i<list->currentSolutions; i++)
   {
-      fprintf(stderr,"Move %u  score %u\n",i,list->solution[i].score );
+     fprintf(stderr,"Move %u  score %u\n",i,list->solution[i].score );
      if (list->solution[i].score > bestScore)
      {
-        *fromX=list->solution[list->currentSolutions].fromX;
-        *fromY=list->solution[list->currentSolutions].fromY;
-        *toX=list->solution[list->currentSolutions].toX;
-        *toY=list->solution[list->currentSolutions].toY;
+        *fromX=list->solution[i].fromX;
+        *fromY=list->solution[i].fromY;
+        *toX=list->solution[i].toX;
+        *toY=list->solution[i].toY;
+        bestScore = list->solution[i].score ;
         fprintf(stderr,"Move %u is best with score %u\n",i,bestScore);
      }
   }
+
+
+  fprintf(stderr,"LastMove was %u,%u  , now we go %u,%u -> %u,%u \n",lastMoveX,lastMoveY,*fromX,*fromY,*toX,*toY);
+  lastMoveX=*toX;
+  lastMoveY=*toY;
   return 1;
 }
 
@@ -114,12 +120,12 @@ int pickBestMoveOfList(struct solutionList * list ,  unsigned int *fromX,unsigne
 
 unsigned int getScoreForMove(  unsigned int fromX,unsigned int fromY  , unsigned int toX, unsigned int toY )
 {
-
-  unsigned int a = ABSDIFF(toX,lastMoveX);
-  unsigned int b = ABSDIFF(toY,lastMoveY);
+  //fprintf(stderr,"lastMoves(%u,%u) \n",lastMoveX,lastMoveY);
+  unsigned int a =  ABSDIFF(toX,lastMoveX);
+  unsigned int b =  ABSDIFF(toY,lastMoveY);
   unsigned int score = a*a +b*b;
 
-  fprintf(stderr,"getScoreForMove(%u,%u,%u,%u) ==  %u \n",fromX,fromY,toX,toY,score);
+  //fprintf(stderr,"getScoreForMove(%u,%u,%u,%u) ==  %u ( a = %u , b = %u ) \n",fromX,fromY,toX,toY,score,a,b);
   return (unsigned int) score;
 }
 
@@ -369,9 +375,6 @@ int suggestMove(unsigned int table[8][8] , unsigned int *fromX,unsigned int *fro
 
 int executeClickAndClick( unsigned int fromPixelX,unsigned int fromPixelY , unsigned int toPixelX, unsigned int toPixelY)
 {
-  lastMoveX=toPixelX;
-  lastMoveY=toPixelY;
-
   if (!allowMouseControl) { return 0; }
 
   if ( (fromPixelX==toPixelX)  && (fromPixelY==toPixelY) ) { fprintf(stderr,"Doing nothing\n"); usleep(1*1000*1000); return 0; }
