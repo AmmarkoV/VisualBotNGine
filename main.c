@@ -23,6 +23,8 @@ int allowMouseControl=1;
 unsigned int clickdelay = 100*1000;
 unsigned int delay = 10*1000;
 
+unsigned int lastMoveX=4,lastMoveY=2;
+
 #define NORMAL "\033[0m"
 #define BLACK "\033[30m" /* Black */
 #define RED "\033[31m" /* Red */
@@ -32,6 +34,9 @@ unsigned int delay = 10*1000;
 #define MAGENTA "\033[35m" /* Magenta */
 #define CYAN "\033[36m" /* Cyan */
 #define WHITE "\033[37m" /* White */
+
+
+#define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
 
 
 int writePieceChar(int pieceVal)
@@ -55,6 +60,68 @@ int writePieceChar(int pieceVal)
 
 
 
+struct solutionItem
+{
+    unsigned int fromX;
+    unsigned int fromY;
+    unsigned int toX;
+    unsigned int toY;
+    unsigned int score;
+};
+
+struct solutionList
+{
+  struct solutionItem solution[256];
+  unsigned int currentSolutions;
+};
+
+
+int addMoveToList(struct solutionList * list ,  unsigned int fromX,unsigned int fromY , unsigned int toX, unsigned int toY , unsigned int score)
+{
+   list->solution[list->currentSolutions].fromX=fromX;
+   list->solution[list->currentSolutions].fromY=fromY;
+   list->solution[list->currentSolutions].toX=toX;
+   list->solution[list->currentSolutions].toY=toY;
+   list->solution[list->currentSolutions].score=score;
+
+  fprintf(stderr,"addMoveToList[%u] (%u,%u,%u,%u) ==  %u \n",list->currentSolutions,fromX,fromY,toX,toY,score);
+
+   ++list->currentSolutions;
+
+   return 1;
+}
+
+int pickBestMoveOfList(struct solutionList * list ,  unsigned int *fromX,unsigned int *fromY , unsigned int *toX, unsigned int *toY)
+{
+  unsigned int bestScore=0;
+  unsigned int i=0;
+  for (i=0; i<list->currentSolutions; i++)
+  {
+      fprintf(stderr,"Move %u  score %u\n",i,list->solution[i].score );
+     if (list->solution[i].score > bestScore)
+     {
+        *fromX=list->solution[list->currentSolutions].fromX;
+        *fromY=list->solution[list->currentSolutions].fromY;
+        *toX=list->solution[list->currentSolutions].toX;
+        *toY=list->solution[list->currentSolutions].toY;
+        fprintf(stderr,"Move %u is best with score %u\n",i,bestScore);
+     }
+  }
+  return 1;
+}
+
+
+
+unsigned int getScoreForMove(  unsigned int fromX,unsigned int fromY  , unsigned int toX, unsigned int toY )
+{
+
+  unsigned int a = ABSDIFF(toX,lastMoveX);
+  unsigned int b = ABSDIFF(toY,lastMoveY);
+  unsigned int score = a*a +b*b;
+
+  fprintf(stderr,"getScoreForMove(%u,%u,%u,%u) ==  %u \n",fromX,fromY,toX,toY,score);
+  return (unsigned int) score;
+}
 
 int suggestMove(unsigned int table[8][8] , unsigned int *fromX,unsigned int *fromY , unsigned int *toX, unsigned int *toY)
 {
@@ -63,6 +130,10 @@ int suggestMove(unsigned int table[8][8] , unsigned int *fromX,unsigned int *fro
     unsigned int limitX=8;
     unsigned int limitY=8;
 
+    struct solutionList list={0};
+    list.currentSolutions=0;
+
+    unsigned int score =0;
     unsigned int x,y=0;
     for (y=0; y<8; y++)
     {
@@ -71,147 +142,171 @@ int suggestMove(unsigned int table[8][8] , unsigned int *fromX,unsigned int *fro
         if (table[x][y]==0) {} else
         //---------------------------------------------------------------------------
         if (
+             (x+2<limitX)&&(y+1<limitY)&&
              (table[x][y]==table[x+1][y])&&
-             (table[x][y]==table[x+2][y+1])&&
-             (x+2<limitX)&&(y+1<limitY)
+             (table[x][y]==table[x+2][y+1])
            )
              { /* X X A
                   B C X */
                 *fromX = x+2; *fromY = y+1; *toX = x+2; *toY = y;
                 fprintf(stderr,"ASolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+2<limitX)&&(y+1<limitY)&&
              (table[x][y+1]==table[x+1][y+1])&&
-             (table[x][y+1]==table[x+2][y])&&
-             (x+2<limitX)&&(y+1<limitY)
+             (table[x][y+1]==table[x+2][y])
            )
              { /* A B X
                   X X C */
                 *fromX = x+2; *fromY = y; *toX = x+2; *toY = y+1;
                 fprintf(stderr,"BSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+2<limitX)&&(y+1<limitY)&&
              (table[x+1][y]==table[x+2][y])&&
-             (table[x][y+1]==table[x+2][y])&&
-             (x+2<limitX)&&(y+1<limitY)
+             (table[x][y+1]==table[x+2][y])
            )
              { /* A X X
                   X B C */
                 *fromX = x; *fromY = y+1; *toX = x; *toY = y;
                 fprintf(stderr,"CSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+2<limitX)&&(y+1<limitY)&&
              (table[x][y]==table[x+1][y+1])&&
-             (table[x][y]==table[x+2][y+1])&&
-             (x+2<limitX)&&(y+1<limitY)
+             (table[x][y]==table[x+2][y+1])
            )
              { /* X B C
                   A X X */
                 *fromX = x; *fromY = y; *toX = x; *toY = y+1;
                 fprintf(stderr,"DSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+2<limitX)&&(y+1<limitY)&&
              (table[x][y+1]==table[x+1][y])&&
-             (table[x][y+1]==table[x+2][y+1])&&
-             (x+2<limitX)&&(y+1<limitY)
+             (table[x][y+1]==table[x+2][y+1])
            )
              { /* A X C
                   X B X */
                 *fromX = x+1; *fromY = y; *toX = x+1; *toY = y+1;
                 fprintf(stderr,"D2Solution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+2<limitX)&&(y+1<limitY)&&
              (table[x][y]==table[x+1][y+1])&&
-             (table[x][y]==table[x+2][y])&&
-             (x+2<limitX)&&(y+1<limitY)
+             (table[x][y]==table[x+2][y])
            )
              { /* X B X
                   A X C */
                 *fromX = x+1; *fromY = y+1; *toX = x+1; *toY = y;
                 fprintf(stderr,"D3Solution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+1<limitX)&&(y+2<limitY)&&
              (table[x+1][y]==table[x][y+1])&&
-             (table[x+1][y]==table[x][y+2])&&
-             (x+1<limitX)&&(y+2<limitY)
+             (table[x+1][y]==table[x][y+2])
            )
              { /* A X
                   X B
                   X C */
                 *fromX = x+1; *fromY = y; *toX = x; *toY = y;
                 fprintf(stderr,"ESolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+1<limitX)&&(y+2<limitY)&&
              (table[x][y]==table[x+1][y+1])&&
-             (table[x][y]==table[x+1][y+2])&&
-             (x+1<limitX)&&(y+2<limitY)
+             (table[x][y]==table[x+1][y+2])
            )
              { /* X A
                   B X
                   C X */
                 *fromX = x; *fromY = y; *toX = x+1; *toY = y;
                 fprintf(stderr,"FSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+1<limitX)&&(y+2<limitY)&&
              (table[x][y]==table[x+1][y+1])&&
-             (table[x][y]==table[x][y+2])&&
-             (x+1<limitX)&&(y+2<limitY)
+             (table[x][y]==table[x][y+2])
            )
              { /* X A
                   B X
                   X C */
                 *fromX = x+1; *fromY = y+1; *toX = x; *toY = y+1;
                 fprintf(stderr,"GSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+1<limitX)&&(y+2<limitY)&&
              (table[x+1][y]==table[x][y+1])&&
-             (table[x+1][y]==table[x+1][y+2])&&
-             (x+1<limitX)&&(y+2<limitY)
+             (table[x+1][y]==table[x+1][y+2])
            )
              { /* A X
                   X B
                   C X */
                 *fromX = x; *fromY = y+1; *toX = x+1; *toY = y+1;
                 fprintf(stderr,"HSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+1<limitX)&&(y+2<limitY)&&
              (table[x+1][y]==table[x+1][y+1])&&
-             (table[x+1][y]==table[x][y+2])&&
-             (x+1<limitX)&&(y+2<limitY)
+             (table[x+1][y]==table[x][y+2])
            )
              { /* A X
                   B X
                   X C */
                 *fromX = x; *fromY = y+2; *toX = x+1; *toY = y+2;
                 fprintf(stderr,"ISolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+1<limitX)&&(y+2<limitY)&&
              (table[x][y]==table[x][y+1])&&
-             (table[x][y]==table[x+1][y+2])&&
-             (x+1<limitX)&&(y+2<limitY)
+             (table[x][y]==table[x+1][y+2])
            )
              { /* X A
                   X B
                   C X */
                 *fromX = x+1; *fromY = y+2; *toX = x; *toY = y+2;
                 fprintf(stderr,"JSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x<limitX)&&(y+3<limitY)&&
              (table[x][y]==table[x][y+1])&&
-             (table[x][y]==table[x][y+3])&&
-             (x<limitX)&&(y+3<limitY)
+             (table[x][y]==table[x][y+3])
            )
              { /* X
                   X
@@ -219,12 +314,14 @@ int suggestMove(unsigned int table[8][8] , unsigned int *fromX,unsigned int *fro
                   X */
                 *fromX = x; *fromY = y+3; *toX = x; *toY = y+2;
                 fprintf(stderr,"KSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x<limitX)&&(y+3<limitY)&&
              (table[x][y]==table[x][y+2])&&
-             (table[x][y]==table[x][y+3])&&
-             (x<limitX)&&(y+3<limitY)
+             (table[x][y]==table[x][y+3])
            )
              { /* X
                   A
@@ -232,38 +329,51 @@ int suggestMove(unsigned int table[8][8] , unsigned int *fromX,unsigned int *fro
                   X */
                 *fromX = x; *fromY = y; *toX = x; *toY = y+1;
                 fprintf(stderr,"KSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+3<limitX)&&(y<limitY)&&
              (table[x][y]==table[x+2][y])&&
-             (table[x][y]==table[x+3][y])&&
-             (x+3<limitX)&&(y<limitY)
+             (table[x][y]==table[x+3][y])
            )
              { /* X A X X */
                 *fromX = x; *fromY = y; *toX = x+1; *toY = y;
                 fprintf(stderr,"LSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
+             (x+3<limitX)&&(y<limitY)&&
              (table[x][y]==table[x+1][y])&&
-             (table[x][y]==table[x+3][y])&&
-             (x+3<limitX)&&(y<limitY)
+             (table[x][y]==table[x+3][y])
            )
              { /* X X A X */
                 *fromX = x+3; *fromY = y; *toX = x+2; *toY = y;
                 fprintf(stderr,"MSolution %u,%u -> %u,%u \n",*fromX,*fromY,*toX,*toY);
+                score=getScoreForMove(*fromX,*fromY,*toX,*toY);
+                addMoveToList(&list,*fromX,*fromY,*toX,*toY,score);
              }
         //---------------------------------------------------------------------------
 
      }
     }
+
+    return pickBestMoveOfList(&list,fromX,fromY,toX,toY);
+
 }
 
 
 
 int executeClickAndClick( unsigned int fromPixelX,unsigned int fromPixelY , unsigned int toPixelX, unsigned int toPixelY)
 {
-  if (!allowSnapshot) { return 0; }
+  lastMoveX=toPixelX;
+  lastMoveY=toPixelY;
+
+  if (!allowMouseControl) { return 0; }
+
   if ( (fromPixelX==toPixelX)  && (fromPixelY==toPixelY) ) { fprintf(stderr,"Doing nothing\n"); usleep(1*1000*1000); return 0; }
   fprintf(stderr,"executeClickAndClick %u,%u -> %u,%u \n",fromPixelX,fromPixelY,toPixelX,toPixelY);
 
@@ -285,7 +395,7 @@ int executeClickAndClick( unsigned int fromPixelX,unsigned int fromPixelY , unsi
 
 int reloadScreen()
 {
-  if (!allowMouseControl) { return 0; }
+  if (!allowSnapshot) { return 0; }
   fprintf(stderr,"reloadScreen\n");
   char commandStr[512]={0};
   sprintf(commandStr,"xwd -root -out out.xwd && convert out.xwd screenshot.pnm");
