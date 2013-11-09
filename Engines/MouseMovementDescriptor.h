@@ -1,7 +1,7 @@
 #ifndef MOUSEMOVEMENTDESCRIPTOR_H_INCLUDED
 #define MOUSEMOVEMENTDESCRIPTOR_H_INCLUDED
 
-enum
+enum clickTypes
 {
   CLICK_AND_CLICK=0,
   CLICK_DRAG_UNCLICK
@@ -11,7 +11,7 @@ enum
 struct mouseMovementItem
 {
    unsigned int fromX;
-   unsigned int fromY
+   unsigned int fromY;
    unsigned int toX;
    unsigned int toY;
    char mode;
@@ -21,7 +21,7 @@ struct mouseMovementItem
 struct mouseMovements
 {
     unsigned int totalMovements;
-    struct mouseMovementItem * movement[12];
+    struct mouseMovementItem movement[100];
 };
 
 

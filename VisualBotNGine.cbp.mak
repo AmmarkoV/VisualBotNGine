@@ -15,7 +15,7 @@ INC =
 CFLAGS = -Wall -fPIC
 RESINC = 
 LIBDIR = 
-LIB = ./Engines/Gweled/libGweledEngine.so xwd-1.0.5/libXwdLib.a
+LIB = xwd-1.0.5/libXwdLib.a -lX11 ./Engines/Gweled/libGweledEngine.so
 LDFLAGS = -ljpeg -lpng
 
 INC_DEBUG = $(INC)

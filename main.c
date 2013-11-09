@@ -7,17 +7,20 @@
 #include "ImageOperations/findSubImage.h"
 #include "ImageOperations/imageOps.h"
 
+#include "Engines/MouseMovementDescriptor.h"
 #include "Engines/Gweled/Gweled.h"
 #include "xwd-1.0.5/XwdLib.h"
 
 #define XWDLIB_BRIDGE 1
+
 
 int allowSnapshot=1;
 int allowMouseControl=1;
 
 
 unsigned int clickdelay = 50*1000;
-unsigned int delay = 0*1000;
+unsigned int delay = 80*1000;
+unsigned int dontknowdelay = 80*1000;
 
 
 void countdownDelay(int seconds)
@@ -127,31 +130,33 @@ int main(int argc, char *argv[])
 
     unsigned int iterations=0;
     unsigned int fromX , fromY , toX , toY;
+    struct mouseMovements ourPlan;
+
+    initializeEngine("bejeweled blitz");
+
+
     while (1)
     {
       fprintf(stderr,"Round %u \n",iterations);
       ++iterations;
 
-      int i=0;
-      for (i=0; i<3; i++)
-      {
           unsigned int  possibleMoves= thinkWhatToPlay(
                                                         haystack->pixels,  haystack->width , haystack->height ,
-                                                        resX , resY ,
-                                                        &fromX , &fromY , &toX , &toY
+                                                        resX , resY ,  &ourPlan
                                                       );
 
        if ( possibleMoves==0 )
-          { fprintf(stderr,"Can't think of a move to play\n"); break;  }
+          {
+            fprintf(stderr,"Can't think of a move to play\n");
+            usleep(dontknowdelay);
+          }
             else
           {
-           fprintf(stderr,"Moving From %u,%u to %u,%u ", fromX , fromY , toX , toY );
-           executeClickAndClick( fromX , fromY , toX , toY  );
+           fprintf(stderr,"Moving From %u,%u to %u,%u ", ourPlan.movement[0].fromX , ourPlan.movement[0].fromY , ourPlan.movement[0].toX , ourPlan.movement[0].toY );
+           executeClickAndClick( ourPlan.movement[0].fromX , ourPlan.movement[0].fromY , ourPlan.movement[0].toX , ourPlan.movement[0].toY  );
          }
 
 
-        if (possibleMoves<3) { break;}
-      }
 
       usleep(delay);
 

@@ -1,22 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../../ImageOperations/imageOps.h"
+#include "Gweled.h"
 
-
-enum gamePieces
-{
-  NO_PIECE = 0,
-  GREEN_PIECE ,
-  WHITE_PIECE ,
-  ORANGE_PIECE ,
-  YELLOW_PIECE ,
-  BLUE_PIECE ,
-  RED_PIECE ,
-  PINK_PIECE
-};
 
 unsigned int lastMoveX=4,lastMoveY=2;
+
+
+struct gweledSettings settings={0};
 
 
 #define NORMAL "\033[0m"
@@ -52,7 +43,43 @@ int writePieceChar(int pieceVal)
   return 0;
 }
 
+int printTable(unsigned int table[8][8])
+{
+        //We now have a valid table!
+    fprintf(stderr,"Table\n");
+    fprintf(stderr,"----------------------------------\n");
+    unsigned int x,y;
+     for (y=0; y<8; y++)
+     {
+       fprintf(stderr,"        |");
+       for (x=0; x<8; x++)
+       {
+        writePieceChar(table[x][y]);
+       }
+       fprintf(stderr,"|\n");
+     }
+    fprintf(stderr,"----------------------------------\n");
 
+}
+
+
+
+
+int isSceneTooAmbiguous(unsigned int table[8][8])
+{
+  unsigned int ambiguous=0;
+  unsigned int x,y;
+  for (y=0; y<8; y++)
+  {
+    for (x=0; x<8; x++)
+    {
+       if (table[x][y]==0) { ++ambiguous; }
+    }
+  }
+
+  if (ambiguous>12) { return 1;}
+  return 0;
+}
 
 struct solutionItem
 {
@@ -79,47 +106,16 @@ int addMoveToList(struct solutionList * list ,  unsigned int fromX,unsigned int 
    list->solution[list->currentSolutions].toY=toY;
    list->solution[list->currentSolutions].score=score;
 
-  fprintf(stderr,"addMoveToList[%u] (%u,%u,%u,%u) ==  %u \n",list->currentSolutions,fromX,fromY,toX,toY,score);
+  //fprintf(stderr,"addMoveToList[%u] (%u,%u,%u,%u) ==  %u \n",list->currentSolutions,fromX,fromY,toX,toY,score);
 
    ++list->currentSolutions;
 
    return 1;
 }
 
-int pickBestMoveOfList(struct solutionList * list ,  unsigned int *fromX,unsigned int *fromY , unsigned int *toX, unsigned int *toY)
-{
-  if (list->currentSolutions==0)
-  {
-    *fromX=0; *fromY=0; *toX=0; *toY=0; return 0;
-  }
 
-  unsigned int bestScore=0;
-  unsigned int i=0;
-  for (i=0; i<list->currentSolutions; i++)
-  {
-     fprintf(stderr,"Move %u  score %u\n",i,list->solution[i].score );
-     if (list->solution[i].score > bestScore)
-     {
-        *fromX=list->solution[i].fromX;
-        *fromY=list->solution[i].fromY;
-        *toX=list->solution[i].toX;
-        *toY=list->solution[i].toY;
-        bestScore = list->solution[i].score ;
-        fprintf(stderr,"Move %u is best with score %u\n",i,bestScore);
-     }
-  }
 
-  if (*fromX>8) { *fromX=*fromX%8; fprintf(stderr,"Error , FromX is %u\n"); }
-  if (*fromY>8) { *fromY=*fromY%8; fprintf(stderr,"Error , FromY is %u\n"); }
-  if (*toX>8) { *toX=*toX%8; fprintf(stderr,"Error , toX is %u\n"); }
-  if (*toY>8) { *toY=*toY%8; fprintf(stderr,"Error , FromX is %u\n"); }
 
-  fprintf(stderr,"LastMove was %u,%u  , now we go %u,%u -> %u,%u \n",lastMoveX,lastMoveY,*fromX,*fromY,*toX,*toY);
-  lastMoveX=*toX;
-  lastMoveY=*toY;
-
-  return list->currentSolutions;
-}
 
 
 
@@ -372,28 +368,58 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
    return 1;
 }
 
-int isSceneTooAmbiguous(unsigned int table[8][8])
+
+
+int formulatePlan(unsigned int table[8][8] , struct solutionList * list , struct mouseMovements * ourPlan)
 {
-  unsigned int ambiguous=0;
-  unsigned int x,y;
-  for (y=0; y<8; y++)
+  unsigned int halfBlockX = (unsigned int) settings.blockX/2;
+  unsigned int halfBlockY = (unsigned int) settings.blockY/2;
+
+
+  ourPlan->totalMovements=0;
+  if (list->currentSolutions==0) { return 0; }
+
+  unsigned int bestScore=0;
+  unsigned int i=0;
+  unsigned int mC = 0;
+  for (i=0; i<list->currentSolutions; i++)
   {
-    for (x=0; x<8; x++)
-    {
-       if (table[x][y]==0) { ++ambiguous; }
-    }
+     //fprintf(stderr,"Move %u  score %u\n",i,list->solution[i].score );
+     if (list->solution[i].score >= bestScore)
+     {
+        if (
+            (list->solution[i].fromX<8) &&
+            (list->solution[i].fromY<8) &&
+            (list->solution[i].toX<8) &&
+            (list->solution[i].toY<8)
+            )
+        {
+           ourPlan->movement[mC].fromX = settings.clientX + halfBlockX + ( list->solution[i].fromX * settings.blockX);
+           ourPlan->movement[mC].fromY = settings.clientY + halfBlockY + ( list->solution[i].fromY * settings.blockY);
+           ourPlan->movement[mC].toX =   settings.clientX + halfBlockX + ( list->solution[i].toX * settings.blockY);
+           ourPlan->movement[mC].toY =   settings.clientY + halfBlockY + ( list->solution[i].toY * settings.blockY);
+           ++mC;
+           ++ourPlan->totalMovements;
+        } else
+        { fprintf(stderr,"Incorrect solution item\n"); }
+
+     }
   }
 
-  if (ambiguous>12) { return 1;}
-  return 0;
-}
+  fprintf(stderr,"LastMove was %u,%u  , now we go %u,%u -> %u,%u ( score %u ) \n",lastMoveX,lastMoveY,
+          ourPlan->movement[mC].fromX , ourPlan->movement[mC].fromY ,
+          ourPlan->movement[mC].toX , ourPlan->movement[mC].toY
+          );
+  lastMoveX=ourPlan->movement[mC].toX;
+  lastMoveY=ourPlan->movement[mC].toY;
 
+  return ourPlan->totalMovements;
+}
 
 
 int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
                     unsigned int clientStartX , unsigned int clientStartY ,
-                    unsigned int * fromX, unsigned int * fromY , unsigned int * toX, unsigned int * toY
-                    )
+                    struct mouseMovements * ourPlan )
 {
     unsigned int resX = clientStartX , resY = clientStartY;
 
@@ -415,46 +441,11 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
 
     unsigned int table[8][8]={0};
 
-    for (y=0; y<8; y++)
-    {
-     for (x=0; x<8; x++)
-     {
-       getRGBPixel(screen,screenWidth,screenHeight, clientX + offsetX + x*blockX + halfBlockX , clientY + offsetY + y*blockY + halfBlockY , &R , &G , &B );
-       fprintf(stderr,"Pos(%u,%u) = %u , %u , %u \n",x,y,R,G,B);
-       /*
-       if ( closeToRGB(R,G,B, 0, 166 , 0 ,threshold)     )      { table[x][y]=GREEN_PIECE; }  else
-       if ( closeToRGB(R,G,B, 200, 200 , 200 ,threshold) )      { table[x][y]=WHITE_PIECE; }  else
-       if ( closeToRGB(R,G,B, 175, 63, 5 ,threshold)     )      { table[x][y]=ORANGE_PIECE; } else
-       if ( closeToRGB(R,G,B, 145, 145, 3 ,threshold)    )      { table[x][y]=YELLOW_PIECE; } else
-       if ( closeToRGB(R,G,B, 0, 189, 249 ,threshold)    )      { table[x][y]=BLUE_PIECE; } else
-       if ( closeToRGB(R,G,B, 213, 95, 115 ,threshold)     )      { table[x][y]=RED_PIECE; } else
-       if ( closeToRGB(R,G,B, 175, 0, 174 ,threshold)    )      { table[x][y]=PINK_PIECE; }
-      */
-
-       if ( closeToRGB(R,G,B, 24, 176 , 44 ,threshold)     )      { table[x][y]=GREEN_PIECE; }  else
-       if ( closeToRGB(R,G,B, 238, 238 , 238 ,threshold) )       { table[x][y]=WHITE_PIECE; }  else
-       if ( closeToRGB(R,G,B, 216, 79, 24 ,threshold)     )      { table[x][y]=ORANGE_PIECE; } else
-       if ( closeToRGB(R,G,B, 254, 254, 39 ,threshold)    )      { table[x][y]=YELLOW_PIECE; } else
-       if ( closeToRGB(R,G,B, 13, 139, 254 ,threshold)    )      { table[x][y]=BLUE_PIECE; } else
-       if ( closeToRGB(R,G,B, 254, 32, 63 ,threshold)     )      { table[x][y]=RED_PIECE; } else
-       if ( closeToRGB(R,G,B, 254, 17, 254,threshold)    )       { table[x][y]=PINK_PIECE; }
-
-     }
-    }
+    //Perform vision to find out table values and populate table array
+    seeTable(table , screen ,  screenWidth , screenHeight , clientStartX ,  clientStartY);
 
     //We now have a valid table!
-    fprintf(stderr,"Table\n");
-    fprintf(stderr,"----------------------------------\n");
-     for (y=0; y<8; y++)
-     {
-       fprintf(stderr,"        |");
-       for (x=0; x<8; x++)
-       {
-        writePieceChar(table[x][y]);
-       }
-       fprintf(stderr,"|\n");
-     }
-    fprintf(stderr,"----------------------------------\n");
+    printTable(table);
 
 
     if ( isSceneTooAmbiguous(table) )
@@ -469,13 +460,35 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
 
     getValidMoves(table , &list );
 
+    unsigned int totalSolutions = formulatePlan(table , &list ,ourPlan);
 
-    unsigned int totalSolutions = pickBestMoveOfList(&list,fromX,fromY,toX,toY);
-
-    *fromX = clientX + halfBlockX + (*fromX*blockX);
-    *fromY = clientY + halfBlockY + (*fromY*blockY);
-    *toX   = clientX + halfBlockX + (*toX*blockX);
-    *toY   = clientY + halfBlockY + (*toY*blockY);
 
     return totalSolutions;
+}
+
+
+int initializeEngine(char * settingsStr)
+{
+    if ( strcasecmp(settingsStr,"bejeweled blitz")==0 )
+    {
+      settings.clientX = 337;
+      settings.clientY = 382;
+      settings.blockX = 40;
+      settings.blockY = 40;
+      settings.offsetX = 0;
+      settings.offsetY = 3;
+      settings.threshold = 29;
+    } else
+    if ( strcasecmp(settingsStr,"gweled")==0 )
+    {
+      settings.clientX = 337;
+      settings.clientY = 382;
+      settings.blockX = 48;
+      settings.blockY = 48;
+      settings.offsetX = 0;
+      settings.offsetY = 3;
+      settings.threshold = 29;
+    }
+
+    return 0;
 }
