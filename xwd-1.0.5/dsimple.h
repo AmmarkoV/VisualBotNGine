@@ -59,6 +59,7 @@ extern int screen;                           /* The current screen */
 char *Get_Display_Name(int *, char **);
 Display *Open_Display(const char *);
 void Setup_Display_And_Screen(int *, char **);
+void Setup_Null_Display_And_Screen( );
 Window getRootWindow();
 
 void Close_Display(void);

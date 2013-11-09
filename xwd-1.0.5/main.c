@@ -115,7 +115,8 @@ static int ReadColors(Visual *, Colormap, XColor **);
 
 int initXwdLib(int argc, char  **argv)
 {
-    Setup_Display_And_Screen(argc,argv);
+    //Setup_Display_And_Screen(argc,argv);
+    Setup_Null_Display_And_Screen();
 }
 
 
@@ -126,21 +127,13 @@ int closeXwdLib()
 
 int getScreen(unsigned char * frame , unsigned int * frameWidth , unsigned int * frameHeight)
 {
+    target_win=getRootWindow();
 
-    //INIT_NAME;
+    /* Let the user select the target window. */
+    if (target_win == None) target_win = Select_Window(dpy, !frame_only);
 
-    getRootWindow();
-
-    /*
-     * Let the user select the target window.
-     */
-    if (target_win == None)
-	target_win = Select_Window(dpy, !frame_only);
-
-    /*
-     * Dump it!
-     */
-    Window_Dump(target_win, out_file , frame , frameWidth , frameHeight);
+    /* Dump it! */
+    Window_Dump(target_win, stdout , frame , frameWidth , frameHeight);
 
 }
 
@@ -166,6 +159,9 @@ Get24bitDirectColors(XColor **colors)
  * Window_Dump: dump a window to a file which must already be open for
  *              writting.
  */
+
+
+
 
 void
 Window_Dump(Window window, FILE *out , unsigned char * data , unsigned int * dataWidth , unsigned int * dataHeight)
@@ -231,12 +227,12 @@ Window_Dump(Window window, FILE *out , unsigned char * data , unsigned int * dat
     width = win_info.width;
     height = win_info.height;
 
-    if (!nobdrs) {
-	absx -= win_info.border_width;
-	absy -= win_info.border_width;
-	width += (2 * win_info.border_width);
-	height += (2 * win_info.border_width);
-    }
+    if (!nobdrs)  {
+                    absx -= win_info.border_width;
+	                absy -= win_info.border_width;
+	                width += (2 * win_info.border_width);
+	                height += (2 * win_info.border_width);
+                  }
     dwidth = DisplayWidth (dpy, screen);
     dheight = DisplayHeight (dpy, screen);
 
@@ -248,12 +244,8 @@ Window_Dump(Window window, FILE *out , unsigned char * data , unsigned int * dat
     if (absy + height > dheight) height = dheight - absy;
 
     XFetchName(dpy, window, &win_name);
-    if (!win_name || !win_name[0]) {
-	win_name = "xwdump";
-	got_win_name = False;
-    } else {
-	got_win_name = True;
-    }
+    if (!win_name || !win_name[0]) { win_name = "xwdump"; got_win_name = False; } else
+                                   { got_win_name = True; }
 
     /* sizeof(char) is included for the null string terminator. */
     win_name_size = strlen(win_name) + sizeof(char);
@@ -265,6 +257,9 @@ Window_Dump(Window window, FILE *out , unsigned char * data , unsigned int * dat
     x = absx - win_info.x;
     y = absy - win_info.y;
 
+    image = XGetImage (dpy, RootWindow(dpy, screen), absx, absy, width, height, AllPlanes, format);
+
+    /*
     multiVis = GetMultiVisualRegions(dpy,RootWindow(dpy, screen),
                absx, absy,
 	       width, height,&transparentOverlays,&numVisuals, &pVisuals,
@@ -289,116 +284,11 @@ Window_Dump(Window window, FILE *out , unsigned char * data , unsigned int * dat
 		 program_name, width, height, x, y);
 	exit (1);
     }
+*/
 
-    if (add_pixel_value != 0) XAddPixel (image, add_pixel_value);
 
-    /*
-     * Determine the pixmap size.
-     */
-    buffer_size = Image_Size(image);
-
-    if (debug) outl("xwd: Getting Colors.\n");
-
-    if( !multiVis)
-    {
-       ncolors = Get_XColors(&win_info, &colors);
-       vis = win_info.visual ;
-    }
-    else
-    {
-       ncolors = Get24bitDirectColors(&colors) ;
-       initFakeVisual(&vis_h) ;
-       vis = &vis_h ;
-    }
-    /*
-     * Inform the user that the image has been retrieved.
-     */
-    if (!silent) {
-#ifdef XKB
-	XkbStdBell(dpy,window,FEEP_VOLUME,XkbBI_Proceed);
-	XkbStdBell(dpy,window,FEEP_VOLUME,XkbBI_RepeatingLastBell);
-#else
-	XBell(dpy, FEEP_VOLUME);
-	XBell(dpy, FEEP_VOLUME);
-#endif
-	XFlush(dpy);
-    }
-
-    /*
-     * Calculate header size.
-     */
-    if (debug) outl("xwd: Calculating header size.\n");
-    header_size = SIZEOF(XWDheader) + win_name_size;
-
-    /*
-     * Write out header information.
-     */
-    if (debug) outl("xwd: Constructing and dumping file header.\n");
-    header.header_size = (CARD32) header_size;
-    header.file_version = (CARD32) XWD_FILE_VERSION;
-    header.pixmap_format = (CARD32) format;
-    header.pixmap_depth = (CARD32) image->depth;
-    header.pixmap_width = (CARD32) image->width;
-    header.pixmap_height = (CARD32) image->height;
-    header.xoffset = (CARD32) image->xoffset;
-    header.byte_order = (CARD32) image->byte_order;
-    header.bitmap_unit = (CARD32) image->bitmap_unit;
-    header.bitmap_bit_order = (CARD32) image->bitmap_bit_order;
-    header.bitmap_pad = (CARD32) image->bitmap_pad;
-    header.bits_per_pixel = (CARD32) image->bits_per_pixel;
-    header.bytes_per_line = (CARD32) image->bytes_per_line;
-    /****
-    header.visual_class = (CARD32) win_info.visual->class;
-    header.red_mask = (CARD32) win_info.visual->red_mask;
-    header.green_mask = (CARD32) win_info.visual->green_mask;
-    header.blue_mask = (CARD32) win_info.visual->blue_mask;
-    header.bits_per_rgb = (CARD32) win_info.visual->bits_per_rgb;
-    header.colormap_entries = (CARD32) win_info.visual->map_entries;
-    *****/
-    header.visual_class = (CARD32) vis->class;
-    header.red_mask = (CARD32) vis->red_mask;
-    header.green_mask = (CARD32) vis->green_mask;
-    header.blue_mask = (CARD32) vis->blue_mask;
-    header.bits_per_rgb = (CARD32) vis->bits_per_rgb;
-    header.colormap_entries = (CARD32) vis->map_entries;
-
-    header.ncolors = ncolors;
-    header.window_width = (CARD32) win_info.width;
-    header.window_height = (CARD32) win_info.height;
-    header.window_x = absx;
-    header.window_y = absy;
-    header.window_bdrwidth = (CARD32) win_info.border_width;
-
-    if (*(char *) &swaptest) {
-	_swaplong((char *) &header, sizeof(header));
-	for (i = 0; i < ncolors; i++) {
-	    _swaplong((char *) &colors[i].pixel, sizeof(CARD32));
-	    _swapshort((char *) &colors[i].red, 3 * sizeof(short));
-	}
-    }
-
-    if (fwrite((char *)&header, SIZEOF(XWDheader), 1, out) != 1 ||
-	fwrite(win_name, win_name_size, 1, out) != 1) {
-	perror("xwd");
-	exit(1);
-    }
-
-    /*
-     * Write out the color maps, if any
-     */
-
-    if (debug) outl("xwd: Dumping %d colors.\n", ncolors);
-    for (i = 0; i < ncolors; i++) {
-	xwdcolor.pixel = colors[i].pixel;
-	xwdcolor.red = colors[i].red;
-	xwdcolor.green = colors[i].green;
-	xwdcolor.blue = colors[i].blue;
-	xwdcolor.flags = colors[i].flags;
-	if (fwrite((char *) &xwdcolor, SIZEOF(XWDColor), 1, out) != 1) {
-	    perror("xwd");
-	    exit(1);
-	}
-    }
+    unsigned int r,g,b;
+    unsigned int pixelvalue;
 
     /*
      * Write out the buffer.
@@ -407,31 +297,28 @@ Window_Dump(Window window, FILE *out , unsigned char * data , unsigned int * dat
 
     *dataWidth =image->width;
     *dataHeight=image->height;
-    memcpy(data,image->data ,image->width * image->height * 3 );
+   // memcpy(data,image->data ,image->width * image->height * 3 );
 
-    /*
-     *    This copying of the bit stream (data) to a file is to be replaced
-     *  by an Xlib call which hasn't been written yet.  It is not clear
-     *  what other functions of xwd will be taken over by this (as yet)
-     *  non-existant X function.
-     */
-    if (fwrite(image->data, (int) buffer_size, 1, out) != 1) {
-	perror("xwd");
-	exit(1);
-    }
+  if ( image->bits_per_pixel/8!=sizeof(int) )
+  {
+      fprintf(stderr,"BitsPerPixel != sizeof(int)    -  %u != %u \n",image->bits_per_pixel,sizeof(int));
+  }
 
-    /*
-     * free the color buffer.
-     */
+  unsigned char * targetPtr = data;
+  unsigned int * line_ptr;
 
-    if(debug && ncolors > 0) outl("xwd: Freeing colors.\n");
-    if(ncolors > 0) free(colors);
+  unsigned long pixel;
+  for ( y=0; y<image->height-1; y++)
+     {
+      for (x=0; x<image->width; x++)
+       {
+           pixel = XGetPixel (image,x,y);
 
-    /*
-     * Free window name string.
-     */
-    if (debug) outl("xwd: Freeing window name string.\n");
-    if (got_win_name) XFree(win_name);
+           *targetPtr = (pixel >> 16) & 0xff; ++targetPtr;
+           *targetPtr = (pixel >>  8) & 0xff; ++targetPtr;
+           *targetPtr = (pixel >>  0) & 0xff; ++targetPtr;
+        }
+     }
 
     /*
      * Free image

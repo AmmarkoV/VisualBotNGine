@@ -132,13 +132,22 @@ void Setup_Display_And_Screen(
 	screen = XDefaultScreen(dpy);
 }
 
+void Setup_Null_Display_And_Screen( )
+{
+    char *displayname = NULL;
+    //displayname = Get_Display_Name(argc, argv);
+	dpy = Open_Display (displayname);
+	screen = XDefaultScreen(dpy);
+}
+
+
+
 /*
  * Close_Display: Close display
  */
 void Close_Display(void)
 {
-    if (dpy == NULL)
-      return;
+    if (dpy == NULL) return;
 
     XCloseDisplay(dpy);
     dpy = NULL;

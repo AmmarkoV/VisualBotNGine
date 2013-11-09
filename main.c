@@ -10,7 +10,7 @@
 #include "Engines/Gweled/Gweled.h"
 #include "xwd-1.0.5/XwdLib.h"
 
-#define XWDLIB_BRIDGE 0
+#define XWDLIB_BRIDGE 1
 
 int allowSnapshot=1;
 int allowMouseControl=1;
@@ -69,8 +69,9 @@ struct Image * reloadScreen(struct Image * lastImg)
   #if XWDLIB_BRIDGE
     struct Image * newImg = createImage(1920,1080,3,8);
     getScreen(newImg->pixels , &newImg->width, &newImg->height);
-    writeImageFile(newImg,PNM_CODEC,"out.pnm");
-    destroyImage(lastImg);
+    //writeImageFile(newImg,PNM_CODEC,"out.pnm");
+    //destroyImage(newImg);
+    return newImg;
   #else
    fprintf(stderr,"reloadScreen\n");
    char commandStr[512]={0};
