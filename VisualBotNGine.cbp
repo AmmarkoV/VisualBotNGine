@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-doNotMove -doNotGrab " />
+				<Option parameters="-doNotMove" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -37,8 +37,9 @@
 		<Linker>
 			<Add option="-ljpeg" />
 			<Add option="-lpng" />
-			<Add library="./Engines/Gweled/libGweledEngine.so" />
 			<Add library="xwd-1.0.5/libXwdLib.a" />
+			<Add library="X11" />
+			<Add library="./Engines/Gweled/libGweledEngine.so" />
 		</Linker>
 		<Unit filename="Codecs/codecs.c">
 			<Option compilerVar="CC" />

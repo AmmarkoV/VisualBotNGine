@@ -67,7 +67,10 @@ struct Image * reloadScreen(struct Image * lastImg)
   if (!allowSnapshot) { return readImage("ramfs/screenshot.pnm",PNM_CODEC,0); }
 
   #if XWDLIB_BRIDGE
-    getScreen(unsigned char * frame , unsigned int frameWidth , unsigned int frameHeight);
+    struct Image * newImg = createImage(1920,1080,3,8);
+    getScreen(newImg->pixels , &newImg->width, &newImg->height);
+    writeImageFile(newImg,PNM_CODEC,"out.pnm");
+    destroyImage(lastImg);
   #else
    fprintf(stderr,"reloadScreen\n");
    char commandStr[512]={0};
@@ -92,6 +95,9 @@ int main(int argc, char *argv[])
     if (strcasecmp(argv[i],"-Delay")==0) { delay=atoi(argv[i+1])*1000; fprintf(stderr,"Set delay to %u\n",delay); }
   }
 
+  #if XWDLIB_BRIDGE
+    initXwdLib(argc,argv);
+  #endif // XWDLIB_BRIDGE
 
     fprintf(stderr,"Please ready your window\n");
     countdownDelay(0);
@@ -153,5 +159,10 @@ int main(int argc, char *argv[])
 
     destroyImage(needle);
     destroyImage(haystack);
+
+  #if XWDLIB_BRIDGE
+    closeXwdLib();
+  #endif // XWDLIB_BRIDGE
+
     return 0;
 }

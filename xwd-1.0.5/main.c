@@ -108,76 +108,29 @@ static long parse_long(char *);
 static int Get24bitDirectColors(XColor **);
 static int ReadColors(Visual *, Colormap, XColor **);
 
+     int i;
+    Window target_win;
+    FILE *out_file = 0;
+    Bool frame_only = False;
 
+int initXwdLib(int argc, char  **argv)
+{
+    Setup_Display_And_Screen(argc,argv);
+}
+
+
+int closeXwdLib()
+{
+    XCloseDisplay(dpy);
+}
 
 int getScreen(unsigned char * frame , unsigned int * frameWidth , unsigned int * frameHeight)
 {
-    register int i;
-    Window target_win;
-    FILE *out_file = stdout;
-    Bool frame_only = False;
 
     //INIT_NAME;
 
-    //Setup_Display_And_Screen(&argc, argv);
     getRootWindow();
 
-/*
-    // Get window select on command line, if any
-    target_win = Select_Window_Args(&argc, argv);
-
-
-    for (i = 1; i < argc; i++)
-        {
-	if (!strcmp(argv[i], "-nobdrs")) {
-	    nobdrs = True;
-	    continue;
-	}
-	if (!strcmp(argv[i], "-debug")) {
-	    debug = True;
-	    continue;
-	}
-	if (!strcmp(argv[i], "-help"))
-	  usage();
-	if (!strcmp(argv[i], "-out")) {
-	    if (++i >= argc) usage();
-	    if (!(out_file = fopen(argv[i], "wb")))
-	      Fatal_Error("Can't open output file as specified.");
-	    standard_out = False;
-	    continue;
-	}
-	if (!strcmp(argv[i], "-xy")) {
-	    format = XYPixmap;
-	    continue;
-	}
-	if (!strcmp(argv[i], "-screen")) {
-	    on_root = True;
-	    continue;
-	}
-	if (!strcmp(argv[i], "-icmap")) {
-	    use_installed = True;
-	    continue;
-	}
-	if (!strcmp(argv[i], "-add")) {
-	    if (++i >= argc) usage();
-	    add_pixel_value = parse_long (argv[i]);
-	    continue;
-	}
-	if (!strcmp(argv[i], "-frame")) {
-	    frame_only = True;
-	    continue;
-	}
-	if (!strcmp(argv[i], "-silent")) {
-	    silent = True;
-	    continue;
-	}
-	usage();
-    }
-#ifdef WIN32
-    if (standard_out)
-	_setmode(fileno(out_file), _O_BINARY);
-#endif
-*/
     /*
      * Let the user select the target window.
      */
@@ -189,12 +142,6 @@ int getScreen(unsigned char * frame , unsigned int * frameWidth , unsigned int *
      */
     Window_Dump(target_win, out_file , frame , frameWidth , frameHeight);
 
-    XCloseDisplay(dpy);
-    if (fclose(out_file)) {
-	perror("xwd");
-	exit(1);
-    }
-    exit(0);
 }
 
 static int

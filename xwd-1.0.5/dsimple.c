@@ -221,7 +221,9 @@ Window Select_Window_Args(
 
 Window getRootWindow()
 {
-  return RootWindow(dpy, screen);
+  Window w=0;
+  w=RootWindow(dpy, screen);
+  return (w);
 }
 
 
