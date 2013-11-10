@@ -20,7 +20,7 @@ int allowMouseControl=1;
 
 unsigned int clickdelay = 50*1000;
 unsigned int delay = 80*1000;
-unsigned int dontknowdelay = 80*1000;
+unsigned int dontknowdelay = 100*1000;
 
 
 void countdownDelay(int seconds)
@@ -38,26 +38,33 @@ void countdownDelay(int seconds)
 }
 
 
-
-int executeClickAndClick( unsigned int fromPixelX,unsigned int fromPixelY , unsigned int toPixelX, unsigned int toPixelY)
+int executePlan(struct mouseMovements * plan)
 {
   if (!allowMouseControl) { return 0; }
 
-  if ( (fromPixelX==toPixelX)  && (fromPixelY==toPixelY) ) { fprintf(stderr,"Doing nothing\n"); usleep(1*1000*1000); return 0; }
-  fprintf(stderr,"executeClickAndClick %u,%u -> %u,%u \n",fromPixelX,fromPixelY,toPixelX,toPixelY);
-
-
+  //fprintf(stderr,"executeClickAndClick %u,%u -> %u,%u \n",fromPixelX,fromPixelY,toPixelX,toPixelY);
 
   char commandStr[512];
-  sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",fromPixelX,fromPixelY);
-  int i = system(commandStr);
+  int i=0 , retres=0;
 
-  fprintf(stderr,"Moving : From OK .. ");
-  usleep(clickdelay);
+  for (i=0; i<plan->totalMovements; i++)
+  {
+   if ( (plan->movement[i].fromX==plan->movement[i].toX)  &&
+        (plan->movement[i].fromY==plan->movement[i].toY) )
+            { fprintf(stderr,"Movement is null\n"); }
+    else
+    {
+      sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",plan->movement[i].fromX,plan->movement[i].fromY);
+      retres=system(commandStr);
+      fprintf(stderr,"Moving : From OK .. ");
 
-  sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",toPixelX,toPixelY);
-  i = system(commandStr);
-  fprintf(stderr,"To OK \n");
+      usleep(clickdelay);
+
+      sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",plan->movement[i].toX,plan->movement[i].toY);
+      retres=system(commandStr);
+      fprintf(stderr,"To OK \n");
+    }
+  }
 
   return 1;
 }
@@ -152,14 +159,10 @@ int main(int argc, char *argv[])
           }
             else
           {
-           fprintf(stderr,"Moving From %u,%u to %u,%u ", ourPlan.movement[0].fromX , ourPlan.movement[0].fromY , ourPlan.movement[0].toX , ourPlan.movement[0].toY );
-           executeClickAndClick( ourPlan.movement[0].fromX , ourPlan.movement[0].fromY , ourPlan.movement[0].toX , ourPlan.movement[0].toY  );
-         }
-
-
+            executePlan(&ourPlan);
+          }
 
       usleep(delay);
-
       haystack = reloadScreen(haystack);
     }
 

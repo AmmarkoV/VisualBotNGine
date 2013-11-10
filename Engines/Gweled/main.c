@@ -4,6 +4,25 @@
 #include "Gweled.h"
 
 
+
+#define MAXSOLUTIONS 256
+
+struct solutionItem
+{
+    unsigned int fromX;
+    unsigned int fromY;
+    unsigned int toX;
+    unsigned int toY;
+    unsigned int score;
+};
+
+struct solutionList
+{
+  struct solutionItem solution[MAXSOLUTIONS+1];
+  unsigned int currentSolutions;
+};
+
+
 unsigned int lastMoveX=4,lastMoveY=2;
 
 
@@ -22,7 +41,6 @@ struct gweledSettings settings={0};
 
 
 #define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
-#define MAXSOLUTIONS 256
 
 int writePieceChar(int pieceVal)
 {
@@ -81,22 +99,6 @@ int isSceneTooAmbiguous(unsigned int table[8][8])
   return 0;
 }
 
-struct solutionItem
-{
-    unsigned int fromX;
-    unsigned int fromY;
-    unsigned int toX;
-    unsigned int toY;
-    unsigned int score;
-};
-
-struct solutionList
-{
-  struct solutionItem solution[MAXSOLUTIONS+1];
-  unsigned int currentSolutions;
-};
-
-
 int addMoveToList(struct solutionList * list ,  unsigned int fromX,unsigned int fromY , unsigned int toX, unsigned int toY , unsigned int score)
 {
    if (MAXSOLUTIONS<=list->currentSolutions) { fprintf(stderr,"No more space for solutions\n"); return 0; }
@@ -129,6 +131,21 @@ unsigned int getScoreForMove(  unsigned int fromX,unsigned int fromY  , unsigned
   //fprintf(stderr,"getScoreForMove(%u,%u,%u,%u) ==  %u ( a = %u , b = %u ) \n",fromX,fromY,toX,toY,score,a,b);
   return (unsigned int) score;
 }
+
+
+/* qsort struct comparision function  */
+int compareSolutions(const void *a, const void *b)
+{
+    struct solutionItem *ia = (struct solutionItem *)a;
+    struct solutionItem *ib = (struct solutionItem *)b;
+
+    if ( ia->score  <  ib->score ) return -1;
+    if ( ia->score ==  ib->score ) return 0;
+    if ( ia->score  >  ib->score ) return 1;
+    return 0;
+}
+
+
 
 int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
 {
@@ -365,6 +382,17 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
 
      }
     }
+
+
+
+   if (list->currentSolutions>1)
+   {
+     //QuickSort solutions
+     qsort( list->solution , list->currentSolutions , sizeof(struct solutionItem), compareSolutions);
+   }
+
+
+   //We have a sorted solution list
    return 1;
 }
 
@@ -408,7 +436,8 @@ int formulatePlan(unsigned int table[8][8] , struct solutionList * list , struct
 
   fprintf(stderr,"LastMove was %u,%u  , now we go %u,%u -> %u,%u ( score %u ) \n",lastMoveX,lastMoveY,
           ourPlan->movement[mC].fromX , ourPlan->movement[mC].fromY ,
-          ourPlan->movement[mC].toX , ourPlan->movement[mC].toY
+          ourPlan->movement[mC].toX , ourPlan->movement[mC].toY ,
+          bestScore
           );
   lastMoveX=ourPlan->movement[mC].toX;
   lastMoveY=ourPlan->movement[mC].toY;
