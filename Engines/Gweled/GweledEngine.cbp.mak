@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./GweledEngine.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/__/__/ImageOperations/findSubImage.o $(OBJDIR_DEBUG)/__/__/ImageOperations/imageOps.o $(OBJDIR_DEBUG)/__/__/ImageOperations/patchComparison.o $(OBJDIR_DEBUG)/main.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/__/__/ImageOperations/findSubImage.o $(OBJDIR_DEBUG)/__/__/ImageOperations/imageOps.o $(OBJDIR_DEBUG)/__/__/ImageOperations/patchComparison.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/vision.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/__/__/ImageOperations/findSubImage.o $(OBJDIR_RELEASE)/__/__/ImageOperations/imageOps.o $(OBJDIR_RELEASE)/__/__/ImageOperations/patchComparison.o $(OBJDIR_RELEASE)/main.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/__/__/ImageOperations/findSubImage.o $(OBJDIR_RELEASE)/__/__/ImageOperations/imageOps.o $(OBJDIR_RELEASE)/__/__/ImageOperations/patchComparison.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/vision.o
 
 all: debug release
 
@@ -71,6 +71,9 @@ $(OBJDIR_DEBUG)/__/__/ImageOperations/patchComparison.o: ../../ImageOperations/p
 
 $(OBJDIR_DEBUG)/main.o: main.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.c -o $(OBJDIR_DEBUG)/main.o
+
+$(OBJDIR_DEBUG)/vision.o: vision.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c vision.c -o $(OBJDIR_DEBUG)/vision.o
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
@@ -101,6 +104,9 @@ $(OBJDIR_RELEASE)/__/__/ImageOperations/patchComparison.o: ../../ImageOperations
 
 $(OBJDIR_RELEASE)/main.o: main.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.c -o $(OBJDIR_RELEASE)/main.o
+
+$(OBJDIR_RELEASE)/vision.o: vision.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c vision.c -o $(OBJDIR_RELEASE)/vision.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
