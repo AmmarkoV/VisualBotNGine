@@ -12,6 +12,77 @@ unsigned int lastMoveX=4,lastMoveY=2;
 #define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
 
 
+
+
+
+int isSceneTooAmbiguous(unsigned int table[8][8])
+{
+  unsigned int ambiguous=0;
+  unsigned int x,y;
+  for (y=0; y<8; y++)
+  {
+    for (x=0; x<8; x++)
+    {
+       if (table[x][y]==0) { ++ambiguous; }
+    }
+  }
+
+  if (ambiguous>12) { return 1;}
+  return 0;
+}
+
+
+int mostPopularPiece(unsigned int table[8][8])
+{
+  unsigned int instancesOfPiece[NUMBER_OF_VALID_PIECES]={0};
+
+  unsigned int x,y;
+  for (y=0; y<8; y++)
+  {
+    for (x=0; x<8; x++)
+    {
+       if (table[x][y]<NUMBER_OF_VALID_PIECES)
+         {
+           ++instancesOfPiece [ table[x][y] ];
+         }
+    }
+  }
+
+  unsigned int mostPopularScore = 0;
+  unsigned int mostPopularPiece = 0;
+   for (x=0; x<NUMBER_OF_VALID_PIECES; x++)
+    {
+      if (mostPopularScore<instancesOfPiece[x])
+      {
+          mostPopularScore=instancesOfPiece[x];
+          mostPopularPiece=x;
+      }
+
+    }
+
+  return mostPopularPiece;
+}
+
+
+unsigned int getFirstPieceOfType(unsigned int table[8][8] , unsigned int pieceType , unsigned int * posX, unsigned int * posY)
+{
+  unsigned int x,y;
+  for (y=0; y<8; y++)
+  {
+    for (x=0; x<8; x++)
+    {
+       if (table[x][y]==pieceType)
+         {
+           *posX = x;
+           *posY = y;
+           return 1;
+         }
+    }
+  }
+ return 0;
+}
+
+
 int addMoveToList(struct solutionList * list ,  unsigned int fromX,unsigned int fromY , unsigned int toX, unsigned int toY , unsigned int score)
 {
    if (MAXSOLUTIONS<=list->currentSolutions) { fprintf(stderr,"No more space for solutions\n"); return 0; }
@@ -76,7 +147,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
             {
                 fprintf(stderr,"Handling Hypercube @ %u,%u \n",x,y);
                 unsigned int what2Link = mostPopularPiece(table);
-                getFirstPiece(table,what2Link , &fromX, &fromY);
+                getFirstPieceOfType(table,what2Link , &fromX, &fromY);
                 toX = x; toY = y;
                 score=100; //HyperCubes are nice
                 addMoveToList(list,fromX,fromY,toX,toY,score);

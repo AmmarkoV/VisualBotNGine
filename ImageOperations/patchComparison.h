@@ -15,4 +15,7 @@ int compareRGBPatches( unsigned char * patchARGB , unsigned int pACX,  unsigned 
                                 unsigned int * score
                               );
 
+unsigned int colorVariance( unsigned char * pixels , unsigned int imageWidth ,unsigned int imageHeight ,
+                            unsigned int pX,  unsigned int pY, unsigned int width , unsigned int height);
+
 #endif // PATCHCOMPARISON_H_INCLUDED

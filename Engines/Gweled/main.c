@@ -35,6 +35,8 @@ int writePieceChar(int pieceVal)
     case BLUE_PIECE : fprintf(stderr,CYAN " B" NORMAL);  break;
     case RED_PIECE : fprintf(stderr,RED " R" NORMAL);  break;
     case PINK_PIECE : fprintf(stderr,MAGENTA " P" NORMAL);  break;
+    case HYPERCUBE_PIECE : fprintf(stderr,MAGENTA " #" NORMAL);  break;
+    case EMPTY_PIECE : fprintf(stderr,MAGENTA " ." NORMAL);  break;
     default :
      fprintf(stderr," ?" );
     break;
@@ -62,72 +64,6 @@ int printTable(unsigned int table[8][8])
 
 }
 
-int mostPopularPiece(unsigned int table[8][8])
-{
-  unsigned int instancesOfPiece[NUMBER_OF_VALID_PIECES]={0};
-
-  unsigned int x,y;
-  for (y=0; y<8; y++)
-  {
-    for (x=0; x<8; x++)
-    {
-       if (table[x][y]<NUMBER_OF_VALID_PIECES)
-         {
-           ++instancesOfPiece [ table[x][y] ];
-         }
-    }
-  }
-
-  unsigned int mostPopularScore = 0;
-  unsigned int mostPopularPiece = 0;
-   for (x=0; x<NUMBER_OF_VALID_PIECES; x++)
-    {
-      if (mostPopularScore<instancesOfPiece[x])
-      {
-          mostPopularScore=instancesOfPiece[x];
-          mostPopularPiece=x;
-      }
-
-    }
-
-  return mostPopularPiece;
-}
-
-
-unsigned int getFirstPiece(unsigned int table[8][8] , unsigned int pieceType , unsigned int * posX, unsigned int * posY)
-{
-  unsigned int x,y;
-  for (y=0; y<8; y++)
-  {
-    for (x=0; x<8; x++)
-    {
-       if (table[x][y]==pieceType)
-         {
-           *posX = x;
-           *posY = y;
-           return 1;
-         }
-    }
-  }
- return 0;
-}
-
-
-int isSceneTooAmbiguous(unsigned int table[8][8])
-{
-  unsigned int ambiguous=0;
-  unsigned int x,y;
-  for (y=0; y<8; y++)
-  {
-    for (x=0; x<8; x++)
-    {
-       if (table[x][y]==0) { ++ambiguous; }
-    }
-  }
-
-  if (ambiguous>12) { return 1;}
-  return 0;
-}
 
 
 
@@ -181,22 +117,9 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
                     struct mouseMovements * ourPlan )
 {
     unsigned int resX = clientStartX , resY = clientStartY;
+    //settings.clientX = clientStartX;
+    //settings.clientY = clientStartY;
 
-
-    unsigned char R ,  G  , B;
-    unsigned int clientX = resX , clientY = resY;
-    unsigned int blockX = 48,  blockY = 48;
-    unsigned int offsetX=0 , offsetY=0;
-
-
-    clientX = 337; clientY = 382;
-    blockX = 40;  blockY = 40;
-    offsetX=0; offsetY=3;
-
-    unsigned int threshold=29;
-    unsigned int halfBlockX = (unsigned int) blockX/2;
-    unsigned int halfBlockY = (unsigned int) blockY/2;
-    unsigned int x,y;
 
     unsigned int table[8][8]={0};
 
@@ -249,5 +172,12 @@ int initializeEngine(char * settingsStr)
       settings.threshold = 29;
     }
 
-    return 0;
+    return initVision();
+}
+
+
+
+int stopEngine()
+{
+    stopVision();
 }

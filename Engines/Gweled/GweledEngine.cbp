@@ -11,6 +11,9 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
+				<Option parameters="-doNotMove " />
+				<Option host_application="../VisualBotNGine" />
+				<Option run_host_application_in_terminal="1" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -23,6 +26,9 @@
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
+				<Option parameters="-doNotMove " />
+				<Option host_application="VisualBotNGine" />
+				<Option run_host_application_in_terminal="0" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -38,6 +44,30 @@
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
 		</Compiler>
+		<Unit filename="../../Codecs/codecs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Codecs/codecs.h" />
+		<Unit filename="../../Codecs/jpgExifexternal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Codecs/jpgExifexternal.h" />
+		<Unit filename="../../Codecs/jpgExiforient_embed.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Codecs/jpgExiforient_embed.h" />
+		<Unit filename="../../Codecs/jpgInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Codecs/jpgInput.h" />
+		<Unit filename="../../Codecs/pngInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Codecs/pngInput.h" />
+		<Unit filename="../../Codecs/ppmInput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Codecs/ppmInput.h" />
 		<Unit filename="../../ImageOperations/findSubImage.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -52,6 +82,10 @@
 		<Unit filename="../../ImageOperations/patchComparison.h" />
 		<Unit filename="../MouseMovementDescriptor.h" />
 		<Unit filename="Gweled.h" />
+		<Unit filename="logic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="logic.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

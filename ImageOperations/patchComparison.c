@@ -116,6 +116,7 @@ int compareRGBPatches( unsigned char * patchARGB , unsigned int pACX,  unsigned 
   //----------------------------------------------------------
 
   //fprintf(stderr,"imageA ( %u,%u ) - imageB ( %u,%u ) \n",pAImageWidth,pAImageHeight,pBImageWidth,pBImageHeight);
+
   fprintf(stderr,"compareRGBPatches ( %u,%u -> %u,%u ) vs ( %u,%u -> %u,%u )  patch %u,%u \n",pACX,pACY,pACX+patchWidth,pACY+patchHeight,
                                                                                               pBCX,pBCY,pBCX+patchWidth,pBCY+patchHeight,
                                                                                               patchWidth,patchHeight
@@ -152,6 +153,59 @@ int compareRGBPatches( unsigned char * patchARGB , unsigned int pACX,  unsigned 
   fprintf(stderr,"Result = %u \n",*score);
   return 1;
 }
+
+
+
+
+
+
+
+
+
+
+unsigned int colorVariance( unsigned char * pixels , unsigned int imageWidth ,unsigned int imageHeight ,
+                            unsigned int pX,  unsigned int pY, unsigned int width , unsigned int height)
+{
+  if (pixels==0) { return 0; }
+  if ( (imageWidth==0) && (imageHeight==0) ) { return 0; }
+
+  unsigned char * pA_PTR      = pixels + MEMPLACE3(pX,pY,imageWidth);
+  unsigned char * pA_LimitPTR = pixels + MEMPLACE3((pX+width),(pY+height),imageWidth);
+  unsigned int pA_LineSkip = (imageWidth-width)*3 ;
+  unsigned char * pA_LineLimitPTR = pA_PTR + (width*3);
+
+
+  unsigned int R = 0 , G = 0 , B = 0;
+  unsigned int lastR = 0 , lastG = 0 , lastB = 0;
+  lastR = *pA_PTR; lastG = *(pA_PTR+1); lastB = *(pA_PTR+2);
+  unsigned int score=0;
+
+  while (pA_PTR < pA_LimitPTR)
+  {
+     while (pA_PTR < pA_LineLimitPTR)
+     {
+        R = * pA_PTR; ++pA_PTR;
+        G = * pA_PTR; ++pA_PTR;
+        B = * pA_PTR; ++pA_PTR;
+
+        score += ABSDIFF(R,lastR);
+        score += ABSDIFF(G,lastG);
+        score += ABSDIFF(B,lastB);
+
+        lastR=R;
+        lastG=G;
+        lastB=B;
+     }
+    pA_LineLimitPTR+= imageWidth*3;
+    pA_PTR+=pA_LineSkip;
+  }
+
+  fprintf(stderr,"Result = %lu \n",score);
+  return score;
+}
+
+
+
 
 
 int compareRGBPatchesCenter( unsigned char * patchARGB , unsigned int pACenterX,  unsigned int pACenterY , unsigned int pAImageWidth , unsigned int pAImageHeight ,

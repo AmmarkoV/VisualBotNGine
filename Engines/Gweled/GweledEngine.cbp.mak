@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./GweledEngine.so
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/__/__/ImageOperations/findSubImage.o $(OBJDIR_DEBUG)/__/__/ImageOperations/imageOps.o $(OBJDIR_DEBUG)/__/__/ImageOperations/patchComparison.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/vision.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/__/__/ImageOperations/findSubImage.o $(OBJDIR_DEBUG)/__/__/ImageOperations/imageOps.o $(OBJDIR_DEBUG)/__/__/ImageOperations/patchComparison.o $(OBJDIR_DEBUG)/logic.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/vision.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/__/__/ImageOperations/findSubImage.o $(OBJDIR_RELEASE)/__/__/ImageOperations/imageOps.o $(OBJDIR_RELEASE)/__/__/ImageOperations/patchComparison.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/vision.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/__/__/ImageOperations/findSubImage.o $(OBJDIR_RELEASE)/__/__/ImageOperations/imageOps.o $(OBJDIR_RELEASE)/__/__/ImageOperations/patchComparison.o $(OBJDIR_RELEASE)/logic.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/vision.o
 
 all: debug release
 
@@ -68,6 +68,9 @@ $(OBJDIR_DEBUG)/__/__/ImageOperations/imageOps.o: ../../ImageOperations/imageOps
 
 $(OBJDIR_DEBUG)/__/__/ImageOperations/patchComparison.o: ../../ImageOperations/patchComparison.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../../ImageOperations/patchComparison.c -o $(OBJDIR_DEBUG)/__/__/ImageOperations/patchComparison.o
+
+$(OBJDIR_DEBUG)/logic.o: logic.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c logic.c -o $(OBJDIR_DEBUG)/logic.o
 
 $(OBJDIR_DEBUG)/main.o: main.c
 	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.c -o $(OBJDIR_DEBUG)/main.o
@@ -101,6 +104,9 @@ $(OBJDIR_RELEASE)/__/__/ImageOperations/imageOps.o: ../../ImageOperations/imageO
 
 $(OBJDIR_RELEASE)/__/__/ImageOperations/patchComparison.o: ../../ImageOperations/patchComparison.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../../ImageOperations/patchComparison.c -o $(OBJDIR_RELEASE)/__/__/ImageOperations/patchComparison.o
+
+$(OBJDIR_RELEASE)/logic.o: logic.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c logic.c -o $(OBJDIR_RELEASE)/logic.o
 
 $(OBJDIR_RELEASE)/main.o: main.c
 	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.c -o $(OBJDIR_RELEASE)/main.o

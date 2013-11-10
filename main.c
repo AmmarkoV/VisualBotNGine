@@ -144,7 +144,11 @@ int main(int argc, char *argv[])
     unsigned int fromX , fromY , toX , toY;
     struct mouseMovements ourPlan;
 
-    initializeEngine("bejeweled blitz");
+    if (! initializeEngine("bejeweled blitz") )
+    {
+       fprintf(stderr,"Error initializing engine :(\n");
+       exit(1);
+    }
 
 
     while (1)
@@ -174,6 +178,7 @@ int main(int argc, char *argv[])
     destroyImage(needle);
     destroyImage(haystack);
 
+    stopEngine();
   #if XWDLIB_BRIDGE
     closeXwdLib();
   #endif // XWDLIB_BRIDGE

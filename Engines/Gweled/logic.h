@@ -22,7 +22,7 @@ struct solutionList
   unsigned int currentSolutions;
 };
 
-
+int isSceneTooAmbiguous(unsigned int table[8][8]);
 
 int getValidMoves(unsigned int table[8][8] , struct solutionList * list);
 

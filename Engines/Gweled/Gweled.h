@@ -20,6 +20,7 @@ enum gweledPieces
   RED_PIECE ,
   PINK_PIECE ,
   HYPERCUBE_PIECE ,
+  EMPTY_PIECE ,
   //-------------------------
   NUMBER_OF_VALID_PIECES
 };
@@ -46,6 +47,7 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
 
 
 int initializeEngine(char * settingsStr);
+int stopEngine();
 
 #ifdef __cplusplus
 }
