@@ -7,6 +7,28 @@
 
 
 #include "../../ImageOperations/imageOps.h"
+#include "../../Codecs/codecs.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int seeTable(unsigned int table[8][8] ,
              unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
@@ -48,4 +70,13 @@ int seeTable(unsigned int table[8][8] ,
 
      }
     }
+}
+
+
+int initVision()
+{
+
+
+
+
 }

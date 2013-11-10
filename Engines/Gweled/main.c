@@ -2,28 +2,11 @@
 #include <stdlib.h>
 
 #include "Gweled.h"
+#include "logic.h"
+#include "vision.h"
 
+#define PLAY_X_BEST_SOLUTIONS 3
 
-
-#define MAXSOLUTIONS 256
-
-struct solutionItem
-{
-    unsigned int fromX;
-    unsigned int fromY;
-    unsigned int toX;
-    unsigned int toY;
-    unsigned int score;
-};
-
-struct solutionList
-{
-  struct solutionItem solution[MAXSOLUTIONS+1];
-  unsigned int currentSolutions;
-};
-
-
-unsigned int lastMoveX=4,lastMoveY=2;
 
 
 struct gweledSettings settings={0};
@@ -40,7 +23,6 @@ struct gweledSettings settings={0};
 #define WHITE "\033[37m" /* White */
 
 
-#define ABSDIFF(num1,num2) ( (num1-num2) >=0 ? (num1-num2) : (num2 - num1) )
 
 int writePieceChar(int pieceVal)
 {
@@ -80,7 +62,55 @@ int printTable(unsigned int table[8][8])
 
 }
 
+int mostPopularPiece(unsigned int table[8][8])
+{
+  unsigned int instancesOfPiece[NUMBER_OF_VALID_PIECES]={0};
 
+  unsigned int x,y;
+  for (y=0; y<8; y++)
+  {
+    for (x=0; x<8; x++)
+    {
+       if (table[x][y]<NUMBER_OF_VALID_PIECES)
+         {
+           ++instancesOfPiece [ table[x][y] ];
+         }
+    }
+  }
+
+  unsigned int mostPopularScore = 0;
+  unsigned int mostPopularPiece = 0;
+   for (x=0; x<NUMBER_OF_VALID_PIECES; x++)
+    {
+      if (mostPopularScore<instancesOfPiece[x])
+      {
+          mostPopularScore=instancesOfPiece[x];
+          mostPopularPiece=x;
+      }
+
+    }
+
+  return mostPopularPiece;
+}
+
+
+unsigned int getFirstPiece(unsigned int table[8][8] , unsigned int pieceType , unsigned int * posX, unsigned int * posY)
+{
+  unsigned int x,y;
+  for (y=0; y<8; y++)
+  {
+    for (x=0; x<8; x++)
+    {
+       if (table[x][y]==pieceType)
+         {
+           *posX = x;
+           *posY = y;
+           return 1;
+         }
+    }
+  }
+ return 0;
+}
 
 
 int isSceneTooAmbiguous(unsigned int table[8][8])
@@ -99,302 +129,6 @@ int isSceneTooAmbiguous(unsigned int table[8][8])
   return 0;
 }
 
-int addMoveToList(struct solutionList * list ,  unsigned int fromX,unsigned int fromY , unsigned int toX, unsigned int toY , unsigned int score)
-{
-   if (MAXSOLUTIONS<=list->currentSolutions) { fprintf(stderr,"No more space for solutions\n"); return 0; }
-   list->solution[list->currentSolutions].fromX=fromX;
-   list->solution[list->currentSolutions].fromY=fromY;
-   list->solution[list->currentSolutions].toX=toX;
-   list->solution[list->currentSolutions].toY=toY;
-   list->solution[list->currentSolutions].score=score;
-
-  //fprintf(stderr,"addMoveToList[%u] (%u,%u,%u,%u) ==  %u \n",list->currentSolutions,fromX,fromY,toX,toY,score);
-
-   ++list->currentSolutions;
-
-   return 1;
-}
-
-
-
-
-
-
-
-unsigned int getScoreForMove(  unsigned int fromX,unsigned int fromY  , unsigned int toX, unsigned int toY )
-{
-  //fprintf(stderr,"lastMoves(%u,%u) \n",lastMoveX,lastMoveY);
-  unsigned int a =  ABSDIFF(toX,lastMoveX);
-  unsigned int b =  ABSDIFF(toY,lastMoveY);
-  unsigned int score = a*a +b*b+(unsigned int) toY/2;
-
-  //fprintf(stderr,"getScoreForMove(%u,%u,%u,%u) ==  %u ( a = %u , b = %u ) \n",fromX,fromY,toX,toY,score,a,b);
-  return (unsigned int) score;
-}
-
-
-/* qsort struct comparision function  */
-int compareSolutions(const void *a, const void *b)
-{
-    struct solutionItem *ia = (struct solutionItem *)a;
-    struct solutionItem *ib = (struct solutionItem *)b;
-
-    if ( ia->score  <  ib->score ) return -1;
-    if ( ia->score ==  ib->score ) return 0;
-    if ( ia->score  >  ib->score ) return 1;
-    return 0;
-}
-
-
-
-int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
-{
-    unsigned int fromX=0 , fromY=0;
-    unsigned int toX=0 ,toY = 0;
-
-    unsigned int limitX=8;
-    unsigned int limitY=8;
-
-    unsigned int score =0;
-    unsigned int x,y=0;
-    for (y=0; y<8; y++)
-    {
-     for (x=0; x<8; x++)
-     {
-        //if (table[x][y]==0) {} else
-        //---------------------------------------------------------------------------
-        if (
-             (x+2<limitX)&&(y+1<limitY)&&
-             (table[x][y]==table[x+1][y])&&
-             (table[x][y]==table[x+2][y+1])
-           )
-             { /* X X A
-                  B C X */
-                fromX = x+2; fromY = y+1; toX = x+2; toY = y;
-                fprintf(stderr,"ASolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+2<limitX)&&(y+1<limitY)&&
-             (table[x][y+1]==table[x+1][y+1])&&
-             (table[x][y+1]==table[x+2][y])
-           )
-             { /* A B X
-                  X X C */
-                fromX = x+2; fromY = y; toX = x+2; toY = y+1;
-                fprintf(stderr,"BSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+2<limitX)&&(y+1<limitY)&&
-             (table[x+1][y]==table[x+2][y])&&
-             (table[x][y+1]==table[x+2][y])
-           )
-             { /* A X X
-                  X B C */
-                fromX = x; fromY = y+1; toX = x; toY = y;
-                fprintf(stderr,"CSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+2<limitX)&&(y+1<limitY)&&
-             (table[x][y]==table[x+1][y+1])&&
-             (table[x][y]==table[x+2][y+1])
-           )
-             { /* X B C
-                  A X X */
-                fromX = x; fromY = y; toX = x; toY = y+1;
-                fprintf(stderr,"DSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+2<limitX)&&(y+1<limitY)&&
-             (table[x][y+1]==table[x+1][y])&&
-             (table[x][y+1]==table[x+2][y+1])
-           )
-             { /* A X C
-                  X B X */
-                fromX = x+1; fromY = y; toX = x+1; toY = y+1;
-                fprintf(stderr,"D2Solution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+2<limitX)&&(y+1<limitY)&&
-             (table[x][y]==table[x+1][y+1])&&
-             (table[x][y]==table[x+2][y])
-           )
-             { /* X B X
-                  A X C */
-                fromX = x+1; fromY = y+1; toX = x+1; toY = y;
-                fprintf(stderr,"D3Solution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+1<limitX)&&(y+2<limitY)&&
-             (table[x+1][y]==table[x][y+1])&&
-             (table[x+1][y]==table[x][y+2])
-           )
-             { /* A X
-                  X B
-                  X C */
-                fromX = x+1; fromY = y; toX = x; toY = y;
-                fprintf(stderr,"ESolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+1<limitX)&&(y+2<limitY)&&
-             (table[x][y]==table[x+1][y+1])&&
-             (table[x][y]==table[x+1][y+2])
-           )
-             { /* X A
-                  B X
-                  C X */
-                fromX = x; fromY = y; toX = x+1; toY = y;
-                fprintf(stderr,"FSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+1<limitX)&&(y+2<limitY)&&
-             (table[x][y]==table[x+1][y+1])&&
-             (table[x][y]==table[x][y+2])
-           )
-             { /* X A
-                  B X
-                  X C */
-                fromX = x+1; fromY = y+1; toX = x; toY = y+1;
-                fprintf(stderr,"GSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+1<limitX)&&(y+2<limitY)&&
-             (table[x+1][y]==table[x][y+1])&&
-             (table[x+1][y]==table[x+1][y+2])
-           )
-             { /* A X
-                  X B
-                  C X */
-                fromX = x; fromY = y+1; toX = x+1; toY = y+1;
-                fprintf(stderr,"HSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+1<limitX)&&(y+2<limitY)&&
-             (table[x+1][y]==table[x+1][y+1])&&
-             (table[x+1][y]==table[x][y+2])
-           )
-             { /* A X
-                  B X
-                  X C */
-                fromX = x; fromY = y+2; toX = x+1; toY = y+2;
-                fprintf(stderr,"ISolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+1<limitX)&&(y+2<limitY)&&
-             (table[x][y]==table[x][y+1])&&
-             (table[x][y]==table[x+1][y+2])
-           )
-             { /* X A
-                  X B
-                  C X */
-                fromX = x+1; fromY = y+2; toX = x; toY = y+2;
-                fprintf(stderr,"JSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x<limitX)&&(y+3<limitY)&&
-             (table[x][y]==table[x][y+1])&&
-             (table[x][y]==table[x][y+3])
-           )
-             { /* X
-                  X
-                  A
-                  X */
-                fromX = x; fromY = y+3; toX = x; toY = y+2;
-                fprintf(stderr,"KSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x<limitX)&&(y+3<limitY)&&
-             (table[x][y]==table[x][y+2])&&
-             (table[x][y]==table[x][y+3])
-           )
-             { /* X
-                  A
-                  X
-                  X */
-                fromX = x; fromY = y; toX = x; toY = y+1;
-                fprintf(stderr,"KSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+3<limitX)&&(y<limitY)&&
-             (table[x][y]==table[x+2][y])&&
-             (table[x][y]==table[x+3][y])
-           )
-             { /* X A X X */
-                fromX = x; fromY = y; toX = x+1; toY = y;
-                fprintf(stderr,"LSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             } else
-        //---------------------------------------------------------------------------
-        if (
-             (x+3<limitX)&&(y<limitY)&&
-             (table[x][y]==table[x+1][y])&&
-             (table[x][y]==table[x+3][y])
-           )
-             { /* X X A X */
-                fromX = x+3; fromY = y; toX = x+2; toY = y;
-                fprintf(stderr,"MSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
-                addMoveToList(list,fromX,fromY,toX,toY,score);
-             }
-        //---------------------------------------------------------------------------
-
-     }
-    }
-
-
-
-   if (list->currentSolutions>1)
-   {
-     //QuickSort solutions
-     qsort( list->solution , list->currentSolutions , sizeof(struct solutionItem), compareSolutions);
-   }
-
-
-   //We have a sorted solution list
-   return 1;
-}
 
 
 
@@ -403,18 +137,18 @@ int formulatePlan(unsigned int table[8][8] , struct solutionList * list , struct
   unsigned int halfBlockX = (unsigned int) settings.blockX/2;
   unsigned int halfBlockY = (unsigned int) settings.blockY/2;
 
-
   ourPlan->totalMovements=0;
   if (list->currentSolutions==0) { return 0; }
 
-  unsigned int bestScore=0;
+  //Keep only X best first solutions
+  if (list->currentSolutions>PLAY_X_BEST_SOLUTIONS) { list->currentSolutions=PLAY_X_BEST_SOLUTIONS; }
+
+ fprintf(stderr,"Old LastMove was %u,%u  / ",lastMoveX,lastMoveY);
+
   unsigned int i=0;
   unsigned int mC = 0;
   for (i=0; i<list->currentSolutions; i++)
   {
-     //fprintf(stderr,"Move %u  score %u\n",i,list->solution[i].score );
-     if (list->solution[i].score >= bestScore)
-     {
         if (
             (list->solution[i].fromX<8) &&
             (list->solution[i].fromY<8) &&
@@ -426,21 +160,17 @@ int formulatePlan(unsigned int table[8][8] , struct solutionList * list , struct
            ourPlan->movement[mC].fromY = settings.clientY + halfBlockY + ( list->solution[i].fromY * settings.blockY);
            ourPlan->movement[mC].toX =   settings.clientX + halfBlockX + ( list->solution[i].toX * settings.blockY);
            ourPlan->movement[mC].toY =   settings.clientY + halfBlockY + ( list->solution[i].toY * settings.blockY);
+           ourPlan->movement[mC].mode = MOVE_CLICK_AND_MOVE_CLICK;
+
+           lastMoveX=list->solution[i].toX;
+           lastMoveY=list->solution[i].toY;
            ++mC;
            ++ourPlan->totalMovements;
         } else
         { fprintf(stderr,"Incorrect solution item\n"); }
-
-     }
   }
 
-  fprintf(stderr,"LastMove was %u,%u  , now we go %u,%u -> %u,%u ( score %u ) \n",lastMoveX,lastMoveY,
-          ourPlan->movement[mC].fromX , ourPlan->movement[mC].fromY ,
-          ourPlan->movement[mC].toX , ourPlan->movement[mC].toY ,
-          bestScore
-          );
-  lastMoveX=ourPlan->movement[mC].toX;
-  lastMoveY=ourPlan->movement[mC].toY;
+  fprintf(stderr,"New LastMove is %u,%u \n",lastMoveX,lastMoveY );
 
   return ourPlan->totalMovements;
 }

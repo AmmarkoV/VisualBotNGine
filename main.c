@@ -13,6 +13,7 @@
 
 #define XWDLIB_BRIDGE 1
 
+#define SECOND_USLEEP 1000*1000
 
 int allowSnapshot=1;
 int allowMouseControl=1;
@@ -31,10 +32,8 @@ void countdownDelay(int seconds)
     for (secCounter=seconds; secCounter>0; secCounter--)
     {
       fprintf(stderr,"%u\n",secCounter);
-      usleep(1000*1000); // Waiting a while for the glitch frames to pass
-
+      usleep(SECOND_USLEEP);
     }
-    usleep(1000*1000); // Waiting a while for the glitch frames to pass
 }
 
 
@@ -54,15 +53,21 @@ int executePlan(struct mouseMovements * plan)
             { fprintf(stderr,"Movement is null\n"); }
     else
     {
-      sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",plan->movement[i].fromX,plan->movement[i].fromY);
-      retres=system(commandStr);
-      fprintf(stderr,"Moving : From OK .. ");
+      switch (plan->movement[i].mode)
+      {
+        case MOVE_CLICK_AND_MOVE_CLICK :
+          sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",plan->movement[i].fromX,plan->movement[i].fromY);
+          retres=system(commandStr);
+          fprintf(stderr,"Moving : From OK .. ");
 
-      usleep(clickdelay);
+          usleep(clickdelay);
 
-      sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",plan->movement[i].toX,plan->movement[i].toY);
-      retres=system(commandStr);
-      fprintf(stderr,"To OK \n");
+          sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",plan->movement[i].toX,plan->movement[i].toY);
+          retres=system(commandStr);
+          fprintf(stderr,"To OK \n");
+        break;
+
+      }
     }
   }
 

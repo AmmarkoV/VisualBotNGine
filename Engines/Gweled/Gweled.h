@@ -9,7 +9,7 @@ extern "C" {
 #include "../MouseMovementDescriptor.h"
 
 
-enum gamePieces
+enum gweledPieces
 {
   NO_PIECE = 0,
   GREEN_PIECE ,
@@ -18,7 +18,10 @@ enum gamePieces
   YELLOW_PIECE ,
   BLUE_PIECE ,
   RED_PIECE ,
-  PINK_PIECE
+  PINK_PIECE ,
+  HYPERCUBE_PIECE ,
+  //-------------------------
+  NUMBER_OF_VALID_PIECES
 };
 
 
