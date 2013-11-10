@@ -12,6 +12,7 @@
 
 
 struct Image * neutral[4];
+struct Image * hypercube[4];
 
 
 
@@ -114,7 +115,7 @@ int initVision()
   neutral[0] = readImage("Engines/Gweled/Pieces/neutral1.pnm",PNM_CODEC,0);
  // writeImageFile(neutral[0],PNM_CODEC,"test0.pnm");
 
-  neutral[1] = readImage("Engines/Gweled/Pieces/neutral5.pnm",PNM_CODEC,0);
+  neutral[1] = readImage("Engines/Gweled/Pieces/neutral2.pnm",PNM_CODEC,0);
 //  writeImageFile(neutral[1],PNM_CODEC,"test1.pnm");
 
   neutral[2] = readImage("Engines/Gweled/Pieces/neutral3.pnm",PNM_CODEC,0);
@@ -124,15 +125,15 @@ int initVision()
 //  writeImageFile(neutral[3],PNM_CODEC,"test3.pnm");
 
 
+
+  hypercube[0] = readImage("Engines/Gweled/Pieces/hypercube1.pnm",PNM_CODEC,0);
+  hypercube[1] = readImage("Engines/Gweled/Pieces/hypercube2.pnm",PNM_CODEC,0);
+  hypercube[2] = readImage("Engines/Gweled/Pieces/hypercube3.pnm",PNM_CODEC,0);
+
+
   unsigned int i=0;
-  for (i=0; i<4; i++)
-  {
-     if (neutral[i]==0)
-     {
-         fprintf(stderr,"Could not open neutral[%u]\n",i);
-         return 0;
-     }
-  }
+  for (i=0; i<4; i++) { if (neutral[i]==0) { fprintf(stderr,"Could not open neutral[%u]\n",i); return 0; } }
+  for (i=0; i<3; i++) { if (hypercube[i]==0) { fprintf(stderr,"Could not open hypercube[%u]\n",i); return 0; } }
 
 
   return 1;
