@@ -47,21 +47,28 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int tiles ,
   unsigned int curSetNum = set->totalPatterns;
   ++set->totalPatterns;
 
-  strncpy(set.pattern[curSetNum].name,name,126);
-  set.pattern[curSetNum].totalTiles=tiles;
-  set.pattern[curSetNum].value=value;
-  set.pattern[curSetNum].acceptScore=score;
-  set.pattern[curSetNum].use=1;
+  strncpy(set->pattern[curSetNum].name,name,126);
+  set->pattern[curSetNum].totalTiles=tiles;
+  set->pattern[curSetNum].value=value;
+  set->pattern[curSetNum].acceptScore=score;
+  set->pattern[curSetNum].use=1;
 
 
   char * fName[512];
+  int i=0;
+  for (i=0; i<tiles; i++)
+  {
+      sprintf(fName,"%s%u.pnm",name,i+1);
+      set->pattern[curSetNum].tile[i] = readImage( fName , PNM_CODEC , 0 );
+  }
 }
 
 
 unsigned int seeFunctionCalls=0;
 
 
-int compareTableTile(unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
+int compareTableTile(struct PatternSet * set ,
+                     unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
                      unsigned int sX,unsigned int sY , unsigned int width ,unsigned int height , unsigned int * pick)
 {
    #if NO_PATCH_COMPARISON
@@ -82,6 +89,47 @@ int compareTableTile(unsigned char * screen , unsigned int screenWidth ,unsigned
    }
 
   // return 0; //Disabled until it is fixed
+
+ int tileNum=0;
+ int patternNum=0;
+ for ( patternNum=0;    patternNum<set->totalPatterns;    patternNum++ )
+ {
+   fprintf(stderr,"Checking for %s\n",set->pattern[patternNum].name);
+   for ( tileNum=0;      tileNum < set->pattern[patternNum].totalTiles;     tileNum++ )
+   {
+       compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
+                                     set->pattern[patternNum].tile[tileNum] , 0,  0 ,
+                                     set->pattern[patternNum].tile[tileNum]->width ,
+                                     set->pattern[patternNum].tile[tileNum]->height,
+                                     123,123,0,
+                                     width, height , &currentScore );
+
+       if (currentScore<bestScore)
+       {
+         bestScore = currentScore;
+         bestPick = set->pattern[patternNum].value;
+       }
+   }
+   if (bestScore < set->pattern[patternNum].acceptScore )
+    {
+      fprintf(stderr,"Selected %s with a score of %u \n",set->pattern[patternNum].name,bestScore);
+      *pick=bestPick;
+      return 1;
+    }
+
+ }
+
+
+
+
+  return 0;
+
+
+
+
+
+
+
 
 
    int i=0;
@@ -202,7 +250,8 @@ int seeTable(unsigned int table[8][8] ,
 
       if
         (
-          compareTableTile(screen,screenWidth,screenHeight,
+          compareTableTile(&set,
+                           screen,screenWidth,screenHeight,
                            settings.clientX + x*settings.blockX,
                            settings.clientY + y*settings.blockY,
                            settings.blockX ,
