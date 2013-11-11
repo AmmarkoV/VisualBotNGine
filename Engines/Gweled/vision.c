@@ -201,7 +201,7 @@ int initVision()
   addToPatternSet(&set,"Engines/Gweled/Pieces/yellow",6,YELLOW_PIECE,23000);
   addToPatternSet(&set,"Engines/Gweled/Pieces/orange",5,ORANGE_PIECE,23000);
   addToPatternSet(&set,"Engines/Gweled/Pieces/red",5,RED_PIECE,23000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/blue",5,BLUE_PIECE,23000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/blue",6,BLUE_PIECE,23000);
   addToPatternSet(&set,"Engines/Gweled/Pieces/green",4,GREEN_PIECE,23000);
   addToPatternSet(&set,"Engines/Gweled/Pieces/pink",4,PINK_PIECE,23000);
   addToPatternSet(&set,"Engines/Gweled/Pieces/white",3,WHITE_PIECE,23000);
