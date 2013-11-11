@@ -9,15 +9,56 @@
 #include "../../ImageOperations/imageOps.h"
 #include "../../Codecs/codecs.h"
 
+#define DUMP_PATCHES 1
 #define NO_PATCH_COMPARISON 0
 
 struct Image * neutral[4];
-struct Image * hypercube[4];
+struct Image * hypercube[14];
 struct Image * yellowPiece[6];
 struct Image * orangePiece[4];
 struct Image * redPiece[3];
 
 
+
+
+
+struct PatternItem
+{
+   unsigned int totalTiles;
+   char * name[128];
+   struct Image * tile[256];
+   unsigned int  value;
+   unsigned char use;
+   unsigned int acceptScore;
+};
+
+struct PatternSet
+{
+    unsigned int totalPatterns;
+    struct PatternItem pattern[256];
+};
+
+
+struct PatternSet set;
+
+
+int addToPatternSet(struct PatternSet * set , char * name , unsigned int tiles , unsigned int value , unsigned int score)
+{
+  unsigned int curSetNum = set->totalPatterns;
+  ++set->totalPatterns;
+
+  strncpy(set.pattern[curSetNum].name,name,126);
+  set.pattern[curSetNum].totalTiles=tiles;
+  set.pattern[curSetNum].value=value;
+  set.pattern[curSetNum].acceptScore=score;
+  set.pattern[curSetNum].use=1;
+
+
+  char * fName[512];
+}
+
+
+unsigned int seeFunctionCalls=0;
 
 
 int compareTableTile(unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
@@ -143,6 +184,19 @@ int seeTable(unsigned int table[8][8] ,
     {
      for (x=0; x<8; x++)
      {
+
+        char nameUsed[512]={0};
+        sprintf(nameUsed,"Dump/tile%u_%u_%u",seeFunctionCalls,x,y);
+        bitBltRGBToFile(  nameUsed ,
+                          screen ,
+                          settings.clientX + x*settings.blockX,
+                          settings.clientY + y*settings.blockY,
+                          screenWidth , screenHeight ,
+                          settings.blockX,settings.blockY);
+
+        ++seeFunctionCalls;
+
+
       //Originally unknown piece
       table[x][y]=UNKNOWN_PIECE;
 
@@ -178,47 +232,13 @@ int seeTable(unsigned int table[8][8] ,
 
 int initVision()
 {
-  neutral[0] = readImage("Engines/Gweled/Pieces/neutral1.pnm",PNM_CODEC,0);
- // writeImageFile(neutral[0],PNM_CODEC,"test0.pnm");
 
-  neutral[1] = readImage("Engines/Gweled/Pieces/neutral2.pnm",PNM_CODEC,0);
-//  writeImageFile(neutral[1],PNM_CODEC,"test1.pnm");
-
-  neutral[2] = readImage("Engines/Gweled/Pieces/neutral3.pnm",PNM_CODEC,0);
-//  writeImageFile(neutral[2],PNM_CODEC,"test2.pnm");
-
-  neutral[3] = readImage("Engines/Gweled/Pieces/neutral4.pnm",PNM_CODEC,0);
-//  writeImageFile(neutral[3],PNM_CODEC,"test3.pnm");
-
-
-
-  hypercube[0] = readImage("Engines/Gweled/Pieces/hypercube1.pnm",PNM_CODEC,0);
-  hypercube[1] = readImage("Engines/Gweled/Pieces/hypercube2.pnm",PNM_CODEC,0);
-  hypercube[2] = readImage("Engines/Gweled/Pieces/hypercube3.pnm",PNM_CODEC,0);
-  hypercube[3] = readImage("Engines/Gweled/Pieces/hypercube4.pnm",PNM_CODEC,0);
-
-  yellowPiece[0] = readImage("Engines/Gweled/Pieces/yellow1.pnm",PNM_CODEC,0);
-  yellowPiece[1] = readImage("Engines/Gweled/Pieces/yellow2.pnm",PNM_CODEC,0);
-  yellowPiece[2] = readImage("Engines/Gweled/Pieces/yellow3.pnm",PNM_CODEC,0);
-  yellowPiece[3] = readImage("Engines/Gweled/Pieces/yellow4.pnm",PNM_CODEC,0);
-  yellowPiece[4] = readImage("Engines/Gweled/Pieces/yellow5.pnm",PNM_CODEC,0);
-  yellowPiece[5] = readImage("Engines/Gweled/Pieces/yellow6.pnm",PNM_CODEC,0);
-
-
-  orangePiece[0] = readImage("Engines/Gweled/Pieces/orange1.pnm",PNM_CODEC,0);
-  orangePiece[1] = readImage("Engines/Gweled/Pieces/orange2.pnm",PNM_CODEC,0);
-  orangePiece[2] = readImage("Engines/Gweled/Pieces/orange3.pnm",PNM_CODEC,0);
-  orangePiece[3] = readImage("Engines/Gweled/Pieces/orange4.pnm",PNM_CODEC,0);
-
-
-  redPiece[0] = readImage("Engines/Gweled/Pieces/red1.pnm",PNM_CODEC,0);
-  redPiece[1] = readImage("Engines/Gweled/Pieces/red2.pnm",PNM_CODEC,0);
-  redPiece[2] = readImage("Engines/Gweled/Pieces/red3.pnm",PNM_CODEC,0);
-
-  unsigned int i=0;
-  for (i=0; i<4; i++) { if (neutral[i]==0) { fprintf(stderr,"Could not open neutral[%u]\n",i); return 0; } }
-  for (i=0; i<4; i++) { if (hypercube[i]==0) { fprintf(stderr,"Could not open hypercube[%u]\n",i); return 0; } }
-  for (i=0; i<6; i++) { if (yellowPiece[i]==0) { fprintf(stderr,"Could not open yellowPiece[%u]\n",i); return 0; } }
+  set.totalPatterns=0;
+  //addToPatternSet(&set,"Engines/Gweled/Pieces/neutral",4,NO_PIECE,5000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/hypercube",14,HYPERCUBE_PIECE,15000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/yellow",6,YELLOW_PIECE,23000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/orange",4,ORANGE_PIECE,23000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/red",4,RED_PIECE,23000);
 
 
   return 1;

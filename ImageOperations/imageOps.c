@@ -295,7 +295,7 @@ int bitBltRGBToFile(  char * name  ,
 {
 
  char filename[512];
- sprintf(filename,"tiles/rgb_%s.pnm",name);
+ sprintf(filename,"%s.pnm",name);
 
 
  unsigned char * tile = (unsigned char*) malloc((width+1)*(height+1)*3*sizeof(unsigned char));
@@ -303,7 +303,10 @@ int bitBltRGBToFile(  char * name  ,
  bitbltRGB(tile,0,0,width,height,source,sX,sY,sourceWidth,sourceHeight,width, height);
 
 
- saveRawImageToFile(filename ,tile , width , height, 3 , 8);
+ if ( ! saveRawImageToFile(filename ,tile , width , height, 3 , 8) )
+ {
+     fprintf(stderr,"Could not bit blt to File %s\n",name);
+ }
  free(tile);
 
  return 1;
@@ -318,7 +321,7 @@ int bitBltDepthToFile(  char * name  ,
 {
 
  char filename[512];
- sprintf(filename,"tiles/depth_%s.pnm",name);
+ sprintf(filename,"%s.pnm",name);
 
 
  unsigned short * tile = (unsigned short*) malloc((width+1)*(height+1)*1*sizeof(unsigned short));
