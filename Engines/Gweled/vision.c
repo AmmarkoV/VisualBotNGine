@@ -13,7 +13,8 @@
 
 struct Image * neutral[4];
 struct Image * hypercube[4];
-struct Image * yellowPiece[3];
+struct Image * yellowPiece[5];
+struct Image * orangePiece[2];
 
 
 
@@ -42,21 +43,9 @@ int compareTableTile(unsigned char * screen , unsigned int screenWidth ,unsigned
 
 
    int i=0;
-   /*
-   for (i=0; i<4; i++)
-   {
-       compareRGBPatches( screen , sX ,  sY , screenWidth, screenHeight ,
-                          neutral[i]->pixels , 0,  0 , neutral[i]->width , neutral[i]->height  ,
-                          width, height , &currentScore );
 
-       if (currentScore<bestScore)
-       {
-         bestScore = currentScore;
-       }
-   }
-   if (bestScore < 10000) { *pick=EMPTY_PIECE; return 1; }
- */
-
+   fprintf(stderr,"Checking for hypercubes\n");
+   //Compare to hypercubes
    for (i=0; i<4; i++)
    {
        compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
@@ -70,15 +59,48 @@ int compareTableTile(unsigned char * screen , unsigned int screenWidth ,unsigned
          bestPick = HYPERCUBE_PIECE;
        }
    }
-
-
-
-
-
-
-
-
    if (bestScore < 15000) { *pick=bestPick; return 1; }
+
+   fprintf(stderr,"Checking for yellow pieces\n");
+   //Compare to yellow pieces
+
+
+
+     compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
+                                     orangePiece[0]->pixels , 0,  0 , orangePiece[0]->width , orangePiece[0]->height  ,
+                                     123,123,0,
+                                     width, height , &currentScore );
+       if (currentScore<bestScore)
+       {
+         bestScore = currentScore;
+         bestPick = ORANGE_PIECE;
+       }
+
+
+
+
+
+
+
+
+
+   for (i=0; i<5; i++)
+   {
+       compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
+                                     yellowPiece[i]->pixels , 0,  0 , hypercube[i]->width , hypercube[i]->height  ,
+                                     123,123,0,
+                                     width, height , &currentScore );
+
+       if (currentScore<bestScore)
+       {
+         bestScore = currentScore;
+         bestPick = YELLOW_PIECE;
+       }
+   }
+
+   if (bestScore < 23000) { *pick=bestPick; return 1; }
+
+
 
    return 0;
 }
@@ -167,13 +189,16 @@ int initVision()
   yellowPiece[0] = readImage("Engines/Gweled/Pieces/yellow1.pnm",PNM_CODEC,0);
   yellowPiece[1] = readImage("Engines/Gweled/Pieces/yellow2.pnm",PNM_CODEC,0);
   yellowPiece[2] = readImage("Engines/Gweled/Pieces/yellow3.pnm",PNM_CODEC,0);
+  yellowPiece[3] = readImage("Engines/Gweled/Pieces/yellow4.pnm",PNM_CODEC,0);
+  yellowPiece[4] = readImage("Engines/Gweled/Pieces/yellow5.pnm",PNM_CODEC,0);
 
 
+  orangePiece[0] = readImage("Engines/Gweled/Pieces/orange1.pnm",PNM_CODEC,0);
 
   unsigned int i=0;
   for (i=0; i<4; i++) { if (neutral[i]==0) { fprintf(stderr,"Could not open neutral[%u]\n",i); return 0; } }
   for (i=0; i<4; i++) { if (hypercube[i]==0) { fprintf(stderr,"Could not open hypercube[%u]\n",i); return 0; } }
-  for (i=0; i<3; i++) { if (yellowPiece[i]==0) { fprintf(stderr,"Could not open yellowPiece[%u]\n",i); return 0; } }
+  for (i=0; i<5; i++) { if (yellowPiece[i]==0) { fprintf(stderr,"Could not open yellowPiece[%u]\n",i); return 0; } }
 
 
   return 1;
