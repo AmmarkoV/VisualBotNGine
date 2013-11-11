@@ -12,8 +12,8 @@
 #define GOOD_SCORE_BELOW 35000
 #define MAXIMUM_ACCEPTED_SCORE 40000
 
-#define DUMP_PATTERN_FAILED_PATCHES 1
-#define DUMP_UNKNOWN_PATCHES 0
+#define DUMP_PATTERN_FAILED_PATCHES 0
+#define DUMP_UNKNOWN_PATCHES 1
 #define NO_PATCH_COMPARISON 0
 
 
@@ -68,24 +68,43 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
 
 
   char * fName[512];
-  int i=0;
-  for (i=0; i<255; i++)
+  unsigned int i=0;
+  while (i<255)
   {
       sprintf(fName,"%s%u.pnm",name,i+1);
       if (patFileExists(fName))
       {
         set->pattern[curSetNum].tile[i] = readImage( fName , PNM_CODEC , 0 );
-        sprintf(fName,"Dump/Pattern%uTile%u.pnm",curSetNum,i);
-        writeImageFile(set->pattern[curSetNum].tile[i],PNM_CODEC,fName);
       } else
       {
         set->pattern[curSetNum].totalTiles=i;
         fprintf(stderr,"%s%u.pnm is last\n",name,i);
         break;
       }
+
+      ++i;
   }
   return 1;
 }
+
+int dumpPatternSet(struct PatternSet * pattSet ,char * stage)
+{
+ fprintf(stderr,"dumping Pattern sets deactivated\n");
+ return 0;
+ unsigned int tileNum=0;
+ unsigned int patternNum=0;
+ char fName[512];
+ for ( patternNum=0;    patternNum < pattSet->totalPatterns;    patternNum++ )
+ {
+   fprintf(stderr,"Dumping %s %s\n",stage,pattSet->pattern[patternNum].name);
+   for ( tileNum=0;      tileNum < pattSet->pattern[patternNum].totalTiles;     tileNum++ )
+   {
+        sprintf(fName,"Dump/%sPattern%uTile%u.pnm",stage,patternNum,tileNum);
+        writeImageFile(pattSet->pattern[patternNum].tile[tileNum],PNM_CODEC,fName);
+   }
+  }
+}
+
 
 int emptyPatternSet(struct PatternSet * set)
 {
@@ -97,7 +116,7 @@ int emptyPatternSet(struct PatternSet * set)
 unsigned int seeFunctionCalls=0;
 
 
-int compareTableTile(struct PatternSet * set ,
+int compareTableTile(struct PatternSet * pattSet ,
                      unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
                      unsigned int sX,unsigned int sY , unsigned int width ,unsigned int height , unsigned int * pick)
 {
@@ -106,12 +125,11 @@ int compareTableTile(struct PatternSet * set ,
    #endif // NO_PATCH_COMPARISON
 
 
-   unsigned int currentScore=100000000;
-   unsigned int bestScore=100000000;
+   unsigned int currentScore=10000000;
+   unsigned int bestScore=10000000;
    unsigned int bestPick=NO_PIECE;
    unsigned int bestPattern=0;
    unsigned int bestTile=0;
-
 
 
    if ( colorVariance( screen, screenWidth ,screenHeight , sX,  sY, width , height) < 10150 )
@@ -120,35 +138,23 @@ int compareTableTile(struct PatternSet * set ,
        return 1;
    }
 
-  // return 0; //Disabled until it is fixed
 
- int tileNum=0;
- int patternNum=0;
- for ( patternNum=0;    patternNum < set->totalPatterns;    patternNum++ )
- {
-   fprintf(stderr,"Checking for %s\n",set->pattern[patternNum].name);
-   for ( tileNum=0;      tileNum < set->pattern[patternNum].totalTiles;     tileNum++ )
+  unsigned int tileNum=0;
+  unsigned int patternNum=0;
+  for ( patternNum=0;    patternNum < pattSet->totalPatterns;    patternNum++ )
+  {
+    fprintf(stderr,"Checking for %s\n",pattSet->pattern[patternNum].name);
+    for ( tileNum=0;      tileNum < pattSet->pattern[patternNum].totalTiles;     tileNum++ )
    {
-       currentScore=100000000;
-
-       /*
-       int compareRGBPatchesIgnoreColor
-                     ( unsigned char * patchARGB , unsigned int pACX,  unsigned int pACY , unsigned int pAImageWidth , unsigned int pAImageHeight ,
-                       unsigned char * patchBRGB , unsigned int pBCX,  unsigned int pBCY , unsigned int pBImageWidth , unsigned int pBImageHeight ,
-                       unsigned char ignoreR , unsigned char ignoreG , unsigned char ignoreB ,
-                       unsigned int patchWidth, unsigned int patchHeight  ,
-                       unsigned int * score
-                     )
-
-       */
+       currentScore=10000000;
 
        compareRGBPatchesIgnoreColor(
                                      /*Main Image*/
                                      screen , sX ,  sY , screenWidth, screenHeight ,
                                      /*Specific Tile*/
-                                     set->pattern[patternNum].tile[tileNum] , 0,  0 ,
-                                     set->pattern[patternNum].tile[tileNum]->width ,
-                                     set->pattern[patternNum].tile[tileNum]->height,
+                                     pattSet->pattern[patternNum].tile[tileNum]->pixels , 0,  0 ,
+                                     pattSet->pattern[patternNum].tile[tileNum]->width ,
+                                     pattSet->pattern[patternNum].tile[tileNum]->height,
                                      /*Ignore R , G , B */
                                      123,123,0,
                                      /*Patch Size*/
@@ -162,14 +168,14 @@ int compareTableTile(struct PatternSet * set ,
        if (currentScore<bestScore)
        {
          bestScore = currentScore;
-         bestPick = set->pattern[patternNum].value;
+         bestPick = pattSet->pattern[patternNum].value;
          bestPattern=patternNum;
          bestTile=tileNum;
        }
    }
-   if (bestScore < set->pattern[patternNum].acceptScore )
+   if (bestScore < pattSet->pattern[patternNum].acceptScore )
     {
-      fprintf(stderr,"INSTA-Selected %s with a score of %u \n",set->pattern[patternNum].name,bestScore);
+      fprintf(stderr,"INSTA-Selected %s with a score of %u \n",pattSet->pattern[patternNum].name,bestScore);
       *pick=bestPick;
       return 1;
     }
@@ -185,18 +191,18 @@ int compareTableTile(struct PatternSet * set ,
         #if DUMP_PATTERN_FAILED_PATCHES
          char comment[512]={0};
          char nameUsed[512]={0};
-         sprintf(nameUsed,"Dump/failedPattern%u_s%u_p%u_like%s_score_%u",seeFunctionCalls,singlePixelAssignmentsTotal,patternAssignmentsTotal,getPieceName(bestPick),bestScore);
+         sprintf(nameUsed,"Dump/failedPattern%uTile%u_like%s_score_%u",bestPattern,bestTile,getPieceName(bestPick),bestScore);
          sprintf(comment,"Most like %s ( %u )  with score %u",getPieceName(bestPick),bestPick,bestScore);
          bitBltRGBToFile(  nameUsed ,
                            comment,
                            screen , sX ,  sY , screenWidth, screenHeight, width, height );
 
-         sprintf(nameUsed,"Dump/failedPattern%u_s%u_p%u_like%s_score_%uB",seeFunctionCalls,singlePixelAssignmentsTotal,patternAssignmentsTotal,getPieceName(bestPick),bestScore);
+         sprintf(nameUsed,"Dump/failedPattern%uTile%u_like%s_score_%uB",bestPattern,bestTile,getPieceName(bestPick),bestScore);
          bitBltRGBToFile(  nameUsed , comment,
-                           set->pattern[bestPattern].tile[bestTile] ,
+                           pattSet->pattern[bestPattern].tile[bestTile]->pixels ,
                            0 ,  0
-                           , set->pattern[bestPattern].tile[bestTile]->width , set->pattern[bestPattern].tile[bestTile]->height
-                           , set->pattern[bestPattern].tile[bestTile]->width , set->pattern[bestPattern].tile[bestTile]->height );
+                           , pattSet->pattern[bestPattern].tile[bestTile]->width , pattSet->pattern[bestPattern].tile[bestTile]->height
+                           , pattSet->pattern[bestPattern].tile[bestTile]->width , pattSet->pattern[bestPattern].tile[bestTile]->height );
         #endif // DUMP_PATCHES
 
  return 0;
@@ -218,9 +224,15 @@ int seeTable(unsigned int table[8][8] ,
              unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
              unsigned int clientStartX , unsigned int clientStartY)
 {
+    ++seeFunctionCalls;
+
+    char dumpMsg[512];
+    sprintf(dumpMsg,"see%u",seeFunctionCalls);
+    dumpPatternSet(&set,dumpMsg);
+
+
     patternAssignments=0;
     singlePixelAssignments=0;
-    ++seeFunctionCalls;
 
     unsigned int halfBlockX = (unsigned int) settings.blockX/2;
     unsigned int halfBlockY = (unsigned int) settings.blockY/2;
@@ -302,6 +314,11 @@ int initVision()
   addToPatternSet(&set,"Engines/Gweled/Pieces/pink",PINK_PIECE,GOOD_SCORE_BELOW);
   addToPatternSet(&set,"Engines/Gweled/Pieces/white",WHITE_PIECE,GOOD_SCORE_BELOW);
 // exit(0);
+
+  dumpPatternSet(&set,"Initialization");
+
+
+
   return 1;
 }
 

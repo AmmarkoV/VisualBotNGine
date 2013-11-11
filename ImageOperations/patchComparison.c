@@ -199,7 +199,7 @@ int compareRGBPatchesIgnoreColor
   //unsigned char * pB_LimitPTR = patchBRGB + MEMPLACE3((pBCX+patchWidth),(pBCY+patchHeight),pBImageWidth); // <- IS THIS OK ? or are they *2
   unsigned int pB_LineSkip = (pBImageWidth-patchWidth)*3 ;
 
-  *score = 0;
+  unsigned int tmpScore = 0;
 
   //fprintf(stderr,"pA_PTR = %u , pA_LimitPTR = %u , pA_LineSkip = %u , pA_LineLimitPTR = %u \n",pA_PTR,pA_LimitPTR,pA_LineSkip,pA_LineLimitPTR);
   //fprintf(stderr,"pB_PTR = %u , pB_LineSkip = %u \n",pB_PTR,pB_LineSkip);
@@ -220,9 +220,9 @@ int compareRGBPatchesIgnoreColor
               (B1!=ignoreB) && (B2!=ignoreB)
              )
          {
-          *score+=(unsigned int) ABSDIFF(R1,R2);
-          *score+=(unsigned int) ABSDIFF(G1,G2);
-          *score+=(unsigned int) ABSDIFF(B1,B2);
+          tmpScore+=(unsigned int) ABSDIFF(R1,R2);
+          tmpScore+=(unsigned int) ABSDIFF(G1,G2);
+          tmpScore+=(unsigned int) ABSDIFF(B1,B2);
          } else
          {
            ++ignored;
@@ -232,6 +232,8 @@ int compareRGBPatchesIgnoreColor
     pA_PTR+=pA_LineSkip;
     pB_PTR+=pB_LineSkip;
   }
+
+  *score = tmpScore;
 
   //fprintf(stderr,"Result = %u , Ignored = %u\n",*score,ignored);
   return 1;
