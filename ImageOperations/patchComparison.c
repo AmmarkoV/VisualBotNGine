@@ -233,7 +233,7 @@ int compareRGBPatchesIgnoreColor
     pB_PTR+=pB_LineSkip;
   }
 
-  fprintf(stderr,"Result = %u , Ignored = %u\n",*score,ignored);
+  //fprintf(stderr,"Result = %u , Ignored = %u\n",*score,ignored);
   return 1;
 }
 

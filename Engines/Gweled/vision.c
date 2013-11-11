@@ -9,17 +9,8 @@
 #include "../../ImageOperations/imageOps.h"
 #include "../../Codecs/codecs.h"
 
-#define DUMP_PATCHES 1
+#define DUMP_PATCHES 0
 #define NO_PATCH_COMPARISON 0
-
-struct Image * neutral[4];
-struct Image * hypercube[14];
-struct Image * yellowPiece[6];
-struct Image * orangePiece[4];
-struct Image * redPiece[3];
-
-
-
 
 
 struct PatternItem
@@ -61,6 +52,12 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int tiles ,
       sprintf(fName,"%s%u.pnm",name,i+1);
       set->pattern[curSetNum].tile[i] = readImage( fName , PNM_CODEC , 0 );
   }
+}
+
+int emptyPatternSet(struct PatternSet * set)
+{
+    fprintf(stderr,"TODO free all images here\n");
+    return 0;
 }
 
 
@@ -119,90 +116,7 @@ int compareTableTile(struct PatternSet * set ,
 
  }
 
-
-
-
-  return 0;
-
-
-
-
-
-
-
-
-
-   int i=0;
-
-   fprintf(stderr,"Checking for hypercubes\n");
-   //Compare to hypercubes
-   for (i=0; i<4; i++)
-   {
-       compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
-                          hypercube[i]->pixels , 0,  0 , hypercube[i]->width , hypercube[i]->height  ,
-                          123,123,0,
-                          width, height , &currentScore );
-
-       if (currentScore<bestScore)
-       {
-         bestScore = currentScore;
-         bestPick = HYPERCUBE_PIECE;
-       }
-   }
-   if (bestScore < 15000) { *pick=bestPick; return 1; }
-
-
-   fprintf(stderr,"Checking for orange pieces\n");
-   for (i=0; i<4; i++)
-   {
-     compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
-                                     orangePiece[i]->pixels , 0,  0 , orangePiece[i]->width , orangePiece[i]->height  ,
-                                     123,123,0,
-                                     width, height , &currentScore );
-       if (currentScore<bestScore)
-       {
-         bestScore = currentScore;
-         bestPick = ORANGE_PIECE;
-       }
-   }
-
-
-
-   fprintf(stderr,"Checking for red pieces\n");
-   for (i=0; i<3; i++)
-   {
-     compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
-                                     redPiece[i]->pixels , 0,  0 , redPiece[i]->width , redPiece[i]->height  ,
-                                     123,123,0,
-                                     width, height , &currentScore );
-       if (currentScore<bestScore)
-       {
-         bestScore = currentScore;
-         bestPick = RED_PIECE;
-       }
-   }
-
-
-   fprintf(stderr,"Checking for yellow pieces\n");
-   for (i=0; i<6; i++)
-   {
-       compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
-                                     yellowPiece[i]->pixels , 0,  0 , hypercube[i]->width , hypercube[i]->height  ,
-                                     123,123,0,
-                                     width, height , &currentScore );
-
-       if (currentScore<bestScore)
-       {
-         bestScore = currentScore;
-         bestPick = YELLOW_PIECE;
-       }
-   }
-
-   if (bestScore < 23000) { *pick=bestPick; return 1; }
-
-
-
-   return 0;
+ return 0;
 }
 
 
@@ -221,7 +135,7 @@ int seeTable(unsigned int table[8][8] ,
              unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
              unsigned int clientStartX , unsigned int clientStartY)
 {
-
+    ++seeFunctionCalls;
 
     unsigned int halfBlockX = (unsigned int) settings.blockX/2;
     unsigned int halfBlockY = (unsigned int) settings.blockY/2;
@@ -232,7 +146,7 @@ int seeTable(unsigned int table[8][8] ,
     {
      for (x=0; x<8; x++)
      {
-
+        #if DUMP_PATCHES
         char nameUsed[512]={0};
         sprintf(nameUsed,"Dump/tile%u_%u_%u",seeFunctionCalls,x,y);
         bitBltRGBToFile(  nameUsed ,
@@ -241,8 +155,7 @@ int seeTable(unsigned int table[8][8] ,
                           settings.clientY + y*settings.blockY,
                           screenWidth , screenHeight ,
                           settings.blockX,settings.blockY);
-
-        ++seeFunctionCalls;
+        #endif // DUMP_PATCHES
 
 
       //Originally unknown piece
@@ -284,11 +197,14 @@ int initVision()
 
   set.totalPatterns=0;
   //addToPatternSet(&set,"Engines/Gweled/Pieces/neutral",4,NO_PIECE,5000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/hypercube",14,HYPERCUBE_PIECE,15000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/hypercube",15,HYPERCUBE_PIECE,15000);
   addToPatternSet(&set,"Engines/Gweled/Pieces/yellow",6,YELLOW_PIECE,23000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/orange",4,ORANGE_PIECE,23000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/red",4,RED_PIECE,23000);
-
+  addToPatternSet(&set,"Engines/Gweled/Pieces/orange",5,ORANGE_PIECE,23000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/red",5,RED_PIECE,23000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/blue",5,BLUE_PIECE,23000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/green",4,GREEN_PIECE,23000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/pink",4,PINK_PIECE,23000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/white",3,WHITE_PIECE,23000);
 
   return 1;
 }
@@ -296,5 +212,5 @@ int initVision()
 
 int stopVision()
 {
-  fprintf(stderr,"TODO free all images here\n");
+  emptyPatternSet(&set);
 }
