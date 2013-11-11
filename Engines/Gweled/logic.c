@@ -340,7 +340,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
                   X */
                 fromX = x; fromY = y+3; toX = x; toY = y+2;
                 fprintf(stderr,"KSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
+                score=20+getScoreForMove(fromX,fromY,toX,toY);
                 addMoveToList(list,fromX,fromY,toX,toY,score);
              } else
         //---------------------------------------------------------------------------
@@ -356,7 +356,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
                   X */
                 fromX = x; fromY = y; toX = x; toY = y+1;
                 fprintf(stderr,"KSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
+                score=20+getScoreForMove(fromX,fromY,toX,toY);
                 addMoveToList(list,fromX,fromY,toX,toY,score);
              } else
         //---------------------------------------------------------------------------
@@ -369,7 +369,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
              { /* X A X X */
                 fromX = x; fromY = y; toX = x+1; toY = y;
                 fprintf(stderr,"LSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
+                score=20+getScoreForMove(fromX,fromY,toX,toY);
                 addMoveToList(list,fromX,fromY,toX,toY,score);
              } else
         //---------------------------------------------------------------------------
@@ -382,7 +382,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
              { /* X X A X */
                 fromX = x+3; fromY = y; toX = x+2; toY = y;
                 fprintf(stderr,"MSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
-                score=getScoreForMove(fromX,fromY,toX,toY);
+                score=20+getScoreForMove(fromX,fromY,toX,toY);
                 addMoveToList(list,fromX,fromY,toX,toY,score);
              }
         //---------------------------------------------------------------------------

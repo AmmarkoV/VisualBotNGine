@@ -19,9 +19,11 @@ int allowSnapshot=1;
 int allowMouseControl=1;
 
 
-unsigned int clickdelay = 50*1000;
+unsigned int clickdelay = 10*1000;
 unsigned int delay = 30*1000;
 unsigned int dontknowdelay = 100*1000;
+unsigned int mouseNeutralX = 200;
+unsigned int mouseNeutralY = 500;
 
 
 void countdownDelay(int seconds)
@@ -72,6 +74,15 @@ int executePlan(struct mouseMovements * plan)
   }
 
   return 1;
+}
+
+
+
+void mouseToNeutral()
+{
+  char commandStr[512];
+  sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",mouseNeutralX,mouseNeutralY);
+  int retres=system(commandStr);
 }
 
 
@@ -169,6 +180,7 @@ int main(int argc, char *argv[])
             else
           {
             executePlan(&ourPlan);
+            //mouseToNeutral();
           }
 
       usleep(delay);

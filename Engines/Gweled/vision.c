@@ -9,7 +9,8 @@
 #include "../../ImageOperations/imageOps.h"
 #include "../../Codecs/codecs.h"
 
-#define DUMP_PATCHES 0
+#define MAXIMUM_SCORE 35000
+#define DUMP_UNKNOWN_PATCHES 1
 #define NO_PATCH_COMPARISON 0
 
 
@@ -33,13 +34,26 @@ struct PatternSet
 struct PatternSet set;
 
 
-int addToPatternSet(struct PatternSet * set , char * name , unsigned int tiles , unsigned int value , unsigned int score)
+int patFileExists(char * filename)
+{
+  if (filename==0) { return 0; }
+  FILE * fp = fopen(filename,"r");
+    if (fp!=0)
+    {
+      fclose(fp);
+      return 1;
+    }
+
+  return 0;
+}
+
+
+int addToPatternSet(struct PatternSet * set , char * name , unsigned int value , unsigned int score)
 {
   unsigned int curSetNum = set->totalPatterns;
   ++set->totalPatterns;
 
   strncpy(set->pattern[curSetNum].name,name,126);
-  set->pattern[curSetNum].totalTiles=tiles;
   set->pattern[curSetNum].value=value;
   set->pattern[curSetNum].acceptScore=score;
   set->pattern[curSetNum].use=1;
@@ -47,11 +61,20 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int tiles ,
 
   char * fName[512];
   int i=0;
-  for (i=0; i<tiles; i++)
+  for (i=0; i<255; i++)
   {
       sprintf(fName,"%s%u.pnm",name,i+1);
-      set->pattern[curSetNum].tile[i] = readImage( fName , PNM_CODEC , 0 );
+      if (patFileExists(fName))
+      {
+        set->pattern[curSetNum].tile[i] = readImage( fName , PNM_CODEC , 0 );
+      } else
+      {
+        set->pattern[curSetNum].totalTiles=i;
+        fprintf(stderr,"%s%u.pnm is last\n",name,i);
+        break;
+      }
   }
+  return 1;
 }
 
 int emptyPatternSet(struct PatternSet * set)
@@ -146,16 +169,6 @@ int seeTable(unsigned int table[8][8] ,
     {
      for (x=0; x<8; x++)
      {
-        #if DUMP_PATCHES
-        char nameUsed[512]={0};
-        sprintf(nameUsed,"Dump/tile%u_%u_%u",seeFunctionCalls,x,y);
-        bitBltRGBToFile(  nameUsed ,
-                          screen ,
-                          settings.clientX + x*settings.blockX,
-                          settings.clientY + y*settings.blockY,
-                          screenWidth , screenHeight ,
-                          settings.blockX,settings.blockY);
-        #endif // DUMP_PATCHES
 
 
       //Originally unknown piece
@@ -187,6 +200,23 @@ int seeTable(unsigned int table[8][8] ,
          if ( closeToRGB(R,G,B, 254, 17, 254,settings.threshold)    )       { table[x][y]=PINK_PIECE; }
         }
 
+
+
+        #if DUMP_UNKNOWN_PATCHES
+        if (table[x][y]==UNKNOWN_PIECE)
+        {
+         char nameUsed[512]={0};
+         sprintf(nameUsed,"Dump/tile%u_%u_%u",seeFunctionCalls,x,y);
+         bitBltRGBToFile(  nameUsed ,
+                           screen ,
+                           settings.clientX + x*settings.blockX,
+                           settings.clientY + y*settings.blockY,
+                           screenWidth , screenHeight ,
+                           settings.blockX,settings.blockY);
+        }
+        #endif // DUMP_PATCHES
+
+
      }
     }
 }
@@ -194,18 +224,17 @@ int seeTable(unsigned int table[8][8] ,
 
 int initVision()
 {
-
   set.totalPatterns=0;
   //addToPatternSet(&set,"Engines/Gweled/Pieces/neutral",4,NO_PIECE,5000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/hypercube",15,HYPERCUBE_PIECE,15000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/yellow",6,YELLOW_PIECE,23000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/orange",5,ORANGE_PIECE,23000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/red",5,RED_PIECE,23000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/blue",6,BLUE_PIECE,23000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/green",4,GREEN_PIECE,23000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/pink",4,PINK_PIECE,23000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/white",3,WHITE_PIECE,23000);
-
+  addToPatternSet(&set,"Engines/Gweled/Pieces/hypercube",HYPERCUBE_PIECE,15000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/yellow",YELLOW_PIECE,MAXIMUM_SCORE);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/orange",ORANGE_PIECE,MAXIMUM_SCORE);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/red",RED_PIECE,MAXIMUM_SCORE);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/blue",BLUE_PIECE,MAXIMUM_SCORE);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/green",GREEN_PIECE,MAXIMUM_SCORE);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/pink",PINK_PIECE,MAXIMUM_SCORE);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/white",WHITE_PIECE,MAXIMUM_SCORE);
+ exit(0);
   return 1;
 }
 
