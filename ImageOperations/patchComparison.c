@@ -184,10 +184,11 @@ int compareRGBPatchesIgnoreColor
 
   //fprintf(stderr,"imageA ( %u,%u ) - imageB ( %u,%u ) \n",pAImageWidth,pAImageHeight,pBImageWidth,pBImageHeight);
 
+  /*
   fprintf(stderr,"compareRGBPatchesIgnore ( %u,%u -> %u,%u ) vs ( %u,%u -> %u,%u )  patch %u,%u \n",pACX,pACY,pACX+patchWidth,pACY+patchHeight,
                                                                                               pBCX,pBCY,pBCX+patchWidth,pBCY+patchHeight,
                                                                                               patchWidth,patchHeight
-                                                                                              );
+                                                                                              );*/
 
   unsigned char * pA_PTR      = patchARGB+ MEMPLACE3(pACX,pACY,pAImageWidth);
   unsigned char * pA_LimitPTR = patchARGB+ MEMPLACE3((pACX+patchWidth),(pACY+patchHeight),pAImageWidth);
@@ -283,7 +284,7 @@ unsigned int colorVariance( unsigned char * pixels , unsigned int imageWidth ,un
     pA_PTR+=pA_LineSkip;
   }
 
-  fprintf(stderr,"colorVariance(%u,%u,%u,%u) = %u \n", pX,   pY,  width , height , score);
+  //fprintf(stderr,"colorVariance(%u,%u,%u,%u) = %u \n", pX,   pY,  width , height , score);
   return score;
 }
 
