@@ -175,9 +175,14 @@ unsigned int colorVariance( unsigned char * pixels , unsigned int imageWidth ,un
   unsigned char * pA_LineLimitPTR = pA_PTR + (width*3);
 
 
-  unsigned int R = 0 , G = 0 , B = 0;
-  unsigned int lastR = 0 , lastG = 0 , lastB = 0;
-  lastR = *pA_PTR; lastG = *(pA_PTR+1); lastB = *(pA_PTR+2);
+  unsigned char R = 0 , G = 0 , B = 0;
+  unsigned char lastR = 0 , lastG = 0 , lastB = 0;
+  unsigned char * pTmp_PTR = pA_PTR;
+  lastR = *pTmp_PTR; ++pTmp_PTR;
+  lastG = *pTmp_PTR; ++pTmp_PTR;
+  lastB = *pTmp_PTR; ++pTmp_PTR;
+
+  signed int thisScore=0;
   unsigned int score=0;
 
   while (pA_PTR < pA_LimitPTR)
@@ -188,19 +193,18 @@ unsigned int colorVariance( unsigned char * pixels , unsigned int imageWidth ,un
         G = * pA_PTR; ++pA_PTR;
         B = * pA_PTR; ++pA_PTR;
 
-        score += ABSDIFF(R,lastR);
-        score += ABSDIFF(G,lastG);
-        score += ABSDIFF(B,lastB);
+        if (R>=lastR) { score+=R-lastR; } else { score+=lastR-R; }
+        if (G>=lastG) { score+=G-lastG; } else { score+=lastG-G; }
+        if (B>=lastB) { score+=B-lastB; } else { score+=lastB-B; }
 
-        lastR=R;
-        lastG=G;
-        lastB=B;
+        lastR=R; lastG=G; lastB=B;
      }
+
     pA_LineLimitPTR+= imageWidth*3;
     pA_PTR+=pA_LineSkip;
   }
 
-  fprintf(stderr,"Result = %lu \n",score);
+  fprintf(stderr,"colorVariance(%u,%u,%u,%u) = %u \n", pX,   pY,  width , height , score);
   return score;
 }
 

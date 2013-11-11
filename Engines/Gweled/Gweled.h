@@ -12,6 +12,7 @@ extern "C" {
 enum gweledPieces
 {
   NO_PIECE = 0,
+  UNKNOWN_PIECE = 0,
   GREEN_PIECE ,
   WHITE_PIECE ,
   ORANGE_PIECE ,

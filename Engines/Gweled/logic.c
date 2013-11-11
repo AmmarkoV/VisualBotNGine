@@ -4,7 +4,7 @@
 #include "Gweled.h"
 #include "logic.h"
 
-
+#define TOO_AMBIGOUS_AFTER_X_UNKNOWN_PIECES 15
 
 unsigned int lastMoveX=4,lastMoveY=2;
 
@@ -27,7 +27,7 @@ int isSceneTooAmbiguous(unsigned int table[8][8])
     }
   }
 
-  if (ambiguous>12) { return 1;}
+  if (ambiguous>TOO_AMBIGOUS_AFTER_X_UNKNOWN_PIECES) { return 1;}
   return 0;
 }
 
@@ -143,6 +143,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
     {
      for (x=0; x<8; x++)
      {
+
         if (table[x][y]==HYPERCUBE_PIECE)
             {
                 fprintf(stderr,"Handling Hypercube @ %u,%u \n",x,y);
@@ -155,6 +156,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+2<limitX)&&(y+1<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
              (table[x][y]==table[x+1][y])&&
              (table[x][y]==table[x+2][y+1])
            )
@@ -168,19 +170,21 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+2<limitX)&&(y+1<limitY)&&
+             (table[x][y+1]!=NO_PIECE)&&
              (table[x][y+1]==table[x+1][y+1])&&
              (table[x][y+1]==table[x+2][y])
            )
              { /* A B X
                   X X C */
                 fromX = x+2; fromY = y; toX = x+2; toY = y+1;
-                fprintf(stderr,"BSolution %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
+                fprintf(stderr,"BSolution (%u) %u,%u -> %u,%u \n",table[x][y+1],fromX,fromY,toX,toY);
                 score=getScoreForMove(fromX,fromY,toX,toY);
                 addMoveToList(list,fromX,fromY,toX,toY,score);
              } else
         //---------------------------------------------------------------------------
         if (
              (x+2<limitX)&&(y+1<limitY)&&
+             (table[x][y+1]!=NO_PIECE)&&
              (table[x+1][y]==table[x+2][y])&&
              (table[x][y+1]==table[x+2][y])
            )
@@ -194,6 +198,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+2<limitX)&&(y+1<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
              (table[x][y]==table[x+1][y+1])&&
              (table[x][y]==table[x+2][y+1])
            )
@@ -207,6 +212,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+2<limitX)&&(y+1<limitY)&&
+             (table[x][y+1]!=NO_PIECE)&&
              (table[x][y+1]==table[x+1][y])&&
              (table[x][y+1]==table[x+2][y+1])
            )
@@ -220,6 +226,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+2<limitX)&&(y+1<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
              (table[x][y]==table[x+1][y+1])&&
              (table[x][y]==table[x+2][y])
            )
@@ -233,6 +240,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+1<limitX)&&(y+2<limitY)&&
+             (table[x+1][y]!=NO_PIECE)&&
              (table[x+1][y]==table[x][y+1])&&
              (table[x+1][y]==table[x][y+2])
            )
@@ -247,6 +255,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+1<limitX)&&(y+2<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
              (table[x][y]==table[x+1][y+1])&&
              (table[x][y]==table[x+1][y+2])
            )
@@ -261,6 +270,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+1<limitX)&&(y+2<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
              (table[x][y]==table[x+1][y+1])&&
              (table[x][y]==table[x][y+2])
            )
@@ -275,6 +285,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+1<limitX)&&(y+2<limitY)&&
+             (table[x+1][y]!=NO_PIECE)&&
              (table[x+1][y]==table[x][y+1])&&
              (table[x+1][y]==table[x+1][y+2])
            )
@@ -289,6 +300,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+1<limitX)&&(y+2<limitY)&&
+             (table[x+1][y]!=NO_PIECE)&&
              (table[x+1][y]==table[x+1][y+1])&&
              (table[x+1][y]==table[x][y+2])
            )
@@ -303,6 +315,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+1<limitX)&&(y+2<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
              (table[x][y]==table[x][y+1])&&
              (table[x][y]==table[x+1][y+2])
            )
@@ -317,6 +330,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x<limitX)&&(y+3<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
              (table[x][y]==table[x][y+1])&&
              (table[x][y]==table[x][y+3])
            )
@@ -332,6 +346,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x<limitX)&&(y+3<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
              (table[x][y]==table[x][y+2])&&
              (table[x][y]==table[x][y+3])
            )
@@ -347,6 +362,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+3<limitX)&&(y<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
              (table[x][y]==table[x+2][y])&&
              (table[x][y]==table[x+3][y])
            )
@@ -359,6 +375,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         //---------------------------------------------------------------------------
         if (
              (x+3<limitX)&&(y<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
              (table[x][y]==table[x+1][y])&&
              (table[x][y]==table[x+3][y])
            )
