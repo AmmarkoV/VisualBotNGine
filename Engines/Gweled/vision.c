@@ -13,8 +13,9 @@
 
 struct Image * neutral[4];
 struct Image * hypercube[4];
-struct Image * yellowPiece[5];
-struct Image * orangePiece[2];
+struct Image * yellowPiece[6];
+struct Image * orangePiece[4];
+struct Image * redPiece[3];
 
 
 
@@ -61,13 +62,12 @@ int compareTableTile(unsigned char * screen , unsigned int screenWidth ,unsigned
    }
    if (bestScore < 15000) { *pick=bestPick; return 1; }
 
-   fprintf(stderr,"Checking for yellow pieces\n");
-   //Compare to yellow pieces
 
-
-
+   fprintf(stderr,"Checking for orange pieces\n");
+   for (i=0; i<4; i++)
+   {
      compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
-                                     orangePiece[0]->pixels , 0,  0 , orangePiece[0]->width , orangePiece[0]->height  ,
+                                     orangePiece[i]->pixels , 0,  0 , orangePiece[i]->width , orangePiece[i]->height  ,
                                      123,123,0,
                                      width, height , &currentScore );
        if (currentScore<bestScore)
@@ -75,16 +75,27 @@ int compareTableTile(unsigned char * screen , unsigned int screenWidth ,unsigned
          bestScore = currentScore;
          bestPick = ORANGE_PIECE;
        }
+   }
 
 
 
+   fprintf(stderr,"Checking for red pieces\n");
+   for (i=0; i<3; i++)
+   {
+     compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
+                                     redPiece[i]->pixels , 0,  0 , redPiece[i]->width , redPiece[i]->height  ,
+                                     123,123,0,
+                                     width, height , &currentScore );
+       if (currentScore<bestScore)
+       {
+         bestScore = currentScore;
+         bestPick = RED_PIECE;
+       }
+   }
 
 
-
-
-
-
-   for (i=0; i<5; i++)
+   fprintf(stderr,"Checking for yellow pieces\n");
+   for (i=0; i<6; i++)
    {
        compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
                                      yellowPiece[i]->pixels , 0,  0 , hypercube[i]->width , hypercube[i]->height  ,
@@ -191,14 +202,23 @@ int initVision()
   yellowPiece[2] = readImage("Engines/Gweled/Pieces/yellow3.pnm",PNM_CODEC,0);
   yellowPiece[3] = readImage("Engines/Gweled/Pieces/yellow4.pnm",PNM_CODEC,0);
   yellowPiece[4] = readImage("Engines/Gweled/Pieces/yellow5.pnm",PNM_CODEC,0);
+  yellowPiece[5] = readImage("Engines/Gweled/Pieces/yellow6.pnm",PNM_CODEC,0);
 
 
   orangePiece[0] = readImage("Engines/Gweled/Pieces/orange1.pnm",PNM_CODEC,0);
+  orangePiece[1] = readImage("Engines/Gweled/Pieces/orange2.pnm",PNM_CODEC,0);
+  orangePiece[2] = readImage("Engines/Gweled/Pieces/orange3.pnm",PNM_CODEC,0);
+  orangePiece[3] = readImage("Engines/Gweled/Pieces/orange4.pnm",PNM_CODEC,0);
+
+
+  redPiece[0] = readImage("Engines/Gweled/Pieces/red1.pnm",PNM_CODEC,0);
+  redPiece[1] = readImage("Engines/Gweled/Pieces/red2.pnm",PNM_CODEC,0);
+  redPiece[2] = readImage("Engines/Gweled/Pieces/red3.pnm",PNM_CODEC,0);
 
   unsigned int i=0;
   for (i=0; i<4; i++) { if (neutral[i]==0) { fprintf(stderr,"Could not open neutral[%u]\n",i); return 0; } }
   for (i=0; i<4; i++) { if (hypercube[i]==0) { fprintf(stderr,"Could not open hypercube[%u]\n",i); return 0; } }
-  for (i=0; i<5; i++) { if (yellowPiece[i]==0) { fprintf(stderr,"Could not open yellowPiece[%u]\n",i); return 0; } }
+  for (i=0; i<6; i++) { if (yellowPiece[i]==0) { fprintf(stderr,"Could not open yellowPiece[%u]\n",i); return 0; } }
 
 
   return 1;
@@ -207,5 +227,5 @@ int initVision()
 
 int stopVision()
 {
-
+  fprintf(stderr,"TODO free all images here\n");
 }
