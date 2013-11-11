@@ -156,6 +156,85 @@ int compareRGBPatches( unsigned char * patchARGB , unsigned int pACX,  unsigned 
 
 
 
+int compareRGBPatchesIgnoreColor
+                     ( unsigned char * patchARGB , unsigned int pACX,  unsigned int pACY , unsigned int pAImageWidth , unsigned int pAImageHeight ,
+                       unsigned char * patchBRGB , unsigned int pBCX,  unsigned int pBCY , unsigned int pBImageWidth , unsigned int pBImageHeight ,
+                       unsigned char ignoreR , unsigned char ignoreG , unsigned char ignoreB ,
+                       unsigned int patchWidth, unsigned int patchHeight  ,
+                       unsigned int * score
+                     )
+{
+  if ( (patchARGB==0)||(patchBRGB==0) ) { return 0; }
+  if ( (patchWidth==0)||(patchHeight==0) ) { return 0; }
+  if ( (pAImageWidth==0)||(pAImageHeight==0) ) { return 0; }
+  if ( (pBImageWidth==0)||(pBImageHeight==0) ) { return 0; }
+  if ( (pACX>=pAImageWidth)||(pACY>=pAImageHeight) ) { return 0; }
+  if ( (pBCX>=pBImageWidth)||(pBCY>=pBImageHeight) ) { return 0; }
+
+
+  //Check for bounds -----------------------------------------
+  if (pACX+patchWidth>=pAImageWidth)   { patchWidth=pAImageWidth-pACX;  }
+  if (pACY+patchHeight>=pAImageHeight) { patchHeight=pAImageHeight-pACY;  }
+
+  if (pBCX+patchWidth>=pBImageWidth)   { patchWidth=pBImageWidth-pBCX;  }
+  if (pBCY+patchHeight>=pBImageHeight) { patchHeight=pBImageHeight-pBCY;  }
+
+  if ( (patchWidth==0)||(patchHeight==0) ) { return 0; }
+  //----------------------------------------------------------
+
+  //fprintf(stderr,"imageA ( %u,%u ) - imageB ( %u,%u ) \n",pAImageWidth,pAImageHeight,pBImageWidth,pBImageHeight);
+
+  fprintf(stderr,"compareRGBPatchesIgnore ( %u,%u -> %u,%u ) vs ( %u,%u -> %u,%u )  patch %u,%u \n",pACX,pACY,pACX+patchWidth,pACY+patchHeight,
+                                                                                              pBCX,pBCY,pBCX+patchWidth,pBCY+patchHeight,
+                                                                                              patchWidth,patchHeight
+                                                                                              );
+
+  unsigned char * pA_PTR      = patchARGB+ MEMPLACE3(pACX,pACY,pAImageWidth);
+  unsigned char * pA_LimitPTR = patchARGB+ MEMPLACE3((pACX+patchWidth),(pACY+patchHeight),pAImageWidth);
+  unsigned int pA_LineSkip = (pAImageWidth-patchWidth)*3 ;
+  unsigned char * pA_LineLimitPTR = pA_PTR + (patchWidth*3);
+
+  unsigned char * pB_PTR      = patchBRGB + MEMPLACE3(pBCX,pBCY,pBImageWidth);
+  //unsigned char * pB_LimitPTR = patchBRGB + MEMPLACE3((pBCX+patchWidth),(pBCY+patchHeight),pBImageWidth); // <- IS THIS OK ? or are they *2
+  unsigned int pB_LineSkip = (pBImageWidth-patchWidth)*3 ;
+
+  *score = 0;
+
+  //fprintf(stderr,"pA_PTR = %u , pA_LimitPTR = %u , pA_LineSkip = %u , pA_LineLimitPTR = %u \n",pA_PTR,pA_LimitPTR,pA_LineSkip,pA_LineLimitPTR);
+  //fprintf(stderr,"pB_PTR = %u , pB_LineSkip = %u \n",pB_PTR,pB_LineSkip);
+  unsigned char R1,G1,B1,R2,G2,B2;
+  unsigned int ignored=0;
+
+  while (pA_PTR < pA_LimitPTR)
+  {
+     while (pA_PTR < pA_LineLimitPTR)
+     {
+         R1 = (*pA_PTR); ++pA_PTR;  R2 = (*pB_PTR); ++pB_PTR;
+         G1 = (*pA_PTR); ++pA_PTR;  G2 = (*pB_PTR); ++pB_PTR;
+         B1 = (*pA_PTR); ++pA_PTR;  B2 = (*pB_PTR); ++pB_PTR;
+
+         if (
+              (R1!=ignoreR) && (R2!=ignoreR) &&
+              (G1!=ignoreG) && (G2!=ignoreG) &&
+              (B1!=ignoreB) && (B2!=ignoreB)
+             )
+         {
+          *score+=(unsigned int) ABSDIFF(R1,R2);
+          *score+=(unsigned int) ABSDIFF(G1,G2);
+          *score+=(unsigned int) ABSDIFF(B1,B2);
+         } else
+         {
+           ++ignored;
+         }
+     }
+    pA_LineLimitPTR+= pAImageWidth*3;
+    pA_PTR+=pA_LineSkip;
+    pB_PTR+=pB_LineSkip;
+  }
+
+  fprintf(stderr,"Result = %u , Ignored = %u\n",*score,ignored);
+  return 1;
+}
 
 
 

@@ -27,6 +27,7 @@ int compareTableTile(unsigned char * screen , unsigned int screenWidth ,unsigned
 
 
    unsigned int bestScore=100000000;
+   unsigned int bestPick=NO_PIECE;
 
    unsigned int currentScore=0;
 
@@ -37,7 +38,7 @@ int compareTableTile(unsigned char * screen , unsigned int screenWidth ,unsigned
        return 1;
    }
 
-   return 0; //Disabled until it is fixed
+  // return 0; //Disabled until it is fixed
 
 
    int i=0;
@@ -56,24 +57,43 @@ int compareTableTile(unsigned char * screen , unsigned int screenWidth ,unsigned
    if (bestScore < 10000) { *pick=EMPTY_PIECE; return 1; }
  */
 
-   for (i=0; i<3; i++)
+   for (i=0; i<4; i++)
    {
-       compareRGBPatches( screen , sX ,  sY , screenWidth, screenHeight ,
+       compareRGBPatchesIgnoreColor( screen , sX ,  sY , screenWidth, screenHeight ,
                           hypercube[i]->pixels , 0,  0 , hypercube[i]->width , hypercube[i]->height  ,
+                          123,123,0,
                           width, height , &currentScore );
 
        if (currentScore<bestScore)
        {
          bestScore = currentScore;
+         bestPick = HYPERCUBE_PIECE;
        }
    }
-   if (bestScore < 10000) { *pick=HYPERCUBE_PIECE; return 1; }
+
+
+
+
+
+
+
+
+   if (bestScore < 15000) { *pick=bestPick; return 1; }
 
    return 0;
 }
 
 
 
+       /* GWELED Single Pixel values
+       if ( closeToRGB(R,G,B, 0, 166 , 0 ,threshold)     )      { table[x][y]=GREEN_PIECE; }  else
+       if ( closeToRGB(R,G,B, 200, 200 , 200 ,threshold) )      { table[x][y]=WHITE_PIECE; }  else
+       if ( closeToRGB(R,G,B, 175, 63, 5 ,threshold)     )      { table[x][y]=ORANGE_PIECE; } else
+       if ( closeToRGB(R,G,B, 145, 145, 3 ,threshold)    )      { table[x][y]=YELLOW_PIECE; } else
+       if ( closeToRGB(R,G,B, 0, 189, 249 ,threshold)    )      { table[x][y]=BLUE_PIECE; } else
+       if ( closeToRGB(R,G,B, 213, 95, 115 ,threshold)   )      { table[x][y]=RED_PIECE; } else
+       if ( closeToRGB(R,G,B, 175, 0, 174 ,threshold)    )      { table[x][y]=PINK_PIECE; }
+      */
 
 int seeTable(unsigned int table[8][8] ,
              unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
@@ -93,24 +113,15 @@ int seeTable(unsigned int table[8][8] ,
       //Originally unknown piece
       table[x][y]=UNKNOWN_PIECE;
 
-       /*
-       if ( closeToRGB(R,G,B, 0, 166 , 0 ,threshold)     )      { table[x][y]=GREEN_PIECE; }  else
-       if ( closeToRGB(R,G,B, 200, 200 , 200 ,threshold) )      { table[x][y]=WHITE_PIECE; }  else
-       if ( closeToRGB(R,G,B, 175, 63, 5 ,threshold)     )      { table[x][y]=ORANGE_PIECE; } else
-       if ( closeToRGB(R,G,B, 145, 145, 3 ,threshold)    )      { table[x][y]=YELLOW_PIECE; } else
-       if ( closeToRGB(R,G,B, 0, 189, 249 ,threshold)    )      { table[x][y]=BLUE_PIECE; } else
-       if ( closeToRGB(R,G,B, 213, 95, 115 ,threshold)   )      { table[x][y]=RED_PIECE; } else
-       if ( closeToRGB(R,G,B, 175, 0, 174 ,threshold)    )      { table[x][y]=PINK_PIECE; }
-      */
       if
         (
           compareTableTile(screen,screenWidth,screenHeight,
-                           settings.clientX + settings.offsetX + x*settings.blockX,
-                           settings.clientY + settings.offsetY + y*settings.blockY,
+                           settings.clientX + x*settings.blockX,
+                           settings.clientY + y*settings.blockY,
                            settings.blockX ,
                            settings.blockY , &table[x][y] )
         )
-        { fprintf(stderr,"Table[%u][%u] got auto assigned\n",x,y); }
+        { fprintf(stderr,"Table[%u][%u] got assigned via tiles\n",x,y); }
            else
         {
          getRGBPixel(screen,screenWidth,screenHeight,
@@ -151,6 +162,7 @@ int initVision()
   hypercube[0] = readImage("Engines/Gweled/Pieces/hypercube1.pnm",PNM_CODEC,0);
   hypercube[1] = readImage("Engines/Gweled/Pieces/hypercube2.pnm",PNM_CODEC,0);
   hypercube[2] = readImage("Engines/Gweled/Pieces/hypercube3.pnm",PNM_CODEC,0);
+  hypercube[3] = readImage("Engines/Gweled/Pieces/hypercube4.pnm",PNM_CODEC,0);
 
   yellowPiece[0] = readImage("Engines/Gweled/Pieces/yellow1.pnm",PNM_CODEC,0);
   yellowPiece[1] = readImage("Engines/Gweled/Pieces/yellow2.pnm",PNM_CODEC,0);
@@ -160,7 +172,7 @@ int initVision()
 
   unsigned int i=0;
   for (i=0; i<4; i++) { if (neutral[i]==0) { fprintf(stderr,"Could not open neutral[%u]\n",i); return 0; } }
-  for (i=0; i<3; i++) { if (hypercube[i]==0) { fprintf(stderr,"Could not open hypercube[%u]\n",i); return 0; } }
+  for (i=0; i<4; i++) { if (hypercube[i]==0) { fprintf(stderr,"Could not open hypercube[%u]\n",i); return 0; } }
   for (i=0; i<3; i++) { if (yellowPiece[i]==0) { fprintf(stderr,"Could not open yellowPiece[%u]\n",i); return 0; } }
 
 

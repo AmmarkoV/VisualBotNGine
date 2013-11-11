@@ -126,7 +126,7 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
     //Perform vision to find out table values and populate table array
     seeTable(table , screen ,  screenWidth , screenHeight , clientStartX ,  clientStartY);
 
-    //We now have a valid table!
+    //We now have a valid table , lets print it to the console!
     printTable(table);
 
 
