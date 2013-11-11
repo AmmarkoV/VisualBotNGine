@@ -40,6 +40,7 @@ struct gweledSettings
 
 extern struct gweledSettings settings;
 
+char * getPieceName(int pieceVal);
 
 int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
                     unsigned int clientStartX , unsigned int clientStartY ,

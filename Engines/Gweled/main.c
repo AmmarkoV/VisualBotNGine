@@ -23,44 +23,62 @@ struct gweledSettings settings={0};
 #define WHITE "\033[37m" /* White */
 
 
+char * getPieceName(int pieceVal)
+{
+  switch (pieceVal)
+  {
+    case GREEN_PIECE : return " GREEN_PIECE";   break;
+    case WHITE_PIECE : return " WHITE_PIECE";   break;
+    case ORANGE_PIECE : return " ORANGE_PIECE";   break;
+    case YELLOW_PIECE : return " YELLOW_PIECE";   break;
+    case BLUE_PIECE : return " BLUE_PIECE";   break;
+    case RED_PIECE : return " RED_PIECE";   break;
+    case PINK_PIECE : return " PINK_PIECE";   break;
+    case HYPERCUBE_PIECE : return " HYPERCUBE_PIECE";   break;
+    case EMPTY_PIECE : return " EMPTY_PIECE";   break;
+    default :
+     return " ?";
+    break;
+  }
+  return "Nothing ";
+}
 
 int writePieceChar(int pieceVal)
 {
   switch (pieceVal)
   {
-    case GREEN_PIECE : fprintf(stderr,GREEN " G" NORMAL);  break;
-    case WHITE_PIECE : fprintf(stderr,WHITE " W" NORMAL);  break;
-    case ORANGE_PIECE : fprintf(stderr,YELLOW " O" NORMAL);  break;
-    case YELLOW_PIECE : fprintf(stderr,YELLOW " Y" NORMAL);  break;
-    case BLUE_PIECE : fprintf(stderr,CYAN " B" NORMAL);  break;
-    case RED_PIECE : fprintf(stderr,RED " R" NORMAL);  break;
-    case PINK_PIECE : fprintf(stderr,MAGENTA " P" NORMAL);  break;
-    case HYPERCUBE_PIECE : fprintf(stderr,MAGENTA " #" NORMAL);  break;
-    case EMPTY_PIECE : fprintf(stderr,MAGENTA " ." NORMAL);  break;
+    case GREEN_PIECE : printf(GREEN " G" NORMAL);  break;
+    case WHITE_PIECE : printf(WHITE " W" NORMAL);  break;
+    case ORANGE_PIECE : printf(YELLOW " O" NORMAL);  break;
+    case YELLOW_PIECE : printf(YELLOW " Y" NORMAL);  break;
+    case BLUE_PIECE : printf(CYAN " B" NORMAL);  break;
+    case RED_PIECE : printf(RED " R" NORMAL);  break;
+    case PINK_PIECE : printf(MAGENTA " P" NORMAL);  break;
+    case HYPERCUBE_PIECE : printf(MAGENTA " #" NORMAL);  break;
+    case EMPTY_PIECE : printf(MAGENTA " ." NORMAL);  break;
     default :
-     fprintf(stderr," ?" );
+     printf(" ?" );
     break;
   }
-
   return 0;
 }
 
 int printTable(unsigned int table[8][8])
 {
         //We now have a valid table!
-    fprintf(stderr,"Table\n");
-    fprintf(stderr,"----------------------------------\n");
+    printf("Table\n");
+    printf("----------------------------------\n");
     unsigned int x,y;
      for (y=0; y<8; y++)
      {
-       fprintf(stderr,"        |");
+       printf("        |");
        for (x=0; x<8; x++)
        {
         writePieceChar(table[x][y]);
        }
-       fprintf(stderr,"|\n");
+       printf("|\n");
      }
-    fprintf(stderr,"----------------------------------\n");
+    printf("----------------------------------\n");
 
 }
 
@@ -128,11 +146,14 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
 
     //We now have a valid table , lets print it to the console!
     printTable(table);
+     printf("Single Pixel Assignments : %u ( %u ) - Pattern Assignments : %u ( %u )\n",
+                    singlePixelAssignments , singlePixelAssignmentsTotal ,
+                    patternAssignments , patternAssignmentsTotal);
 
 
     if ( isSceneTooAmbiguous(table) )
        {
-         fprintf(stderr,"Scene is too ambiguous :(\nWaiting..\n");
+         printf("Scene is too ambiguous :(\nWaiting..\n");
          return 0;
        }
 
