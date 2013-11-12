@@ -9,11 +9,11 @@
 #include "../../ImageOperations/imageOps.h"
 #include "../../Codecs/codecs.h"
 
-#define GOOD_SCORE_BELOW 35000
-#define MAXIMUM_ACCEPTED_SCORE 40000
+#define GOOD_SCORE_BELOW 500
+#define MAXIMUM_ACCEPTED_SCORE 1000
 
 #define DUMP_PATTERN_FAILED_PATCHES 0
-#define DUMP_UNKNOWN_PATCHES 1
+#define DUMP_UNKNOWN_PATCHES 0
 #define NO_PATCH_COMPARISON 0
 
 

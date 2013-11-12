@@ -20,7 +20,7 @@ int allowMouseControl=1;
 
 
 unsigned int clickdelay = 10*1000;
-unsigned int delay = 30*1000;
+unsigned int delay = 25*1000;
 unsigned int dontknowdelay = 100*1000;
 unsigned int mouseNeutralX = 200;
 unsigned int mouseNeutralY = 500;
