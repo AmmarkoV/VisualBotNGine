@@ -69,16 +69,22 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
 
   char fName[512];
   unsigned int i=0;
+  unsigned int totalTiles = 0;
   while (i<255)
   {
       sprintf(fName,"%s%u.pnm",name,i+1);
       if (patFileExists(fName))
       {
-        set->pattern[curSetNum].tile[i] = readImage( fName , PNM_CODEC , 0 );
+        set->pattern[curSetNum].tile[totalTiles] = readImage( fName , PNM_CODEC , 0 );
+        if (set->pattern[curSetNum].tile[totalTiles]!=0)
+        {
+          fprintf(stderr,"Loaded %s , we now have %u patterns for set %u\n",fName, totalTiles , curSetNum);
+          //It appears we correctly loaded a new pattern file
+          ++totalTiles;
+        }
       } else
       {
-        set->pattern[curSetNum].totalTiles=i;
-        fprintf(stderr,"%s%u.pnm is last\n",name,i);
+        set->pattern[curSetNum].totalTiles=totalTiles ;
         break;
       }
 
@@ -106,10 +112,19 @@ int dumpPatternSet(struct PatternSet * pattSet ,char * stage)
 }
 
 
-int emptyPatternSet(struct PatternSet * set)
+int emptyPatternSet(struct PatternSet * pattSet)
 {
-    fprintf(stderr,"TODO free all images here\n");
-    return 0;
+  unsigned int tileNum=0;
+  unsigned int patternNum=0;
+  for ( patternNum=0;    patternNum < pattSet->totalPatterns;    patternNum++ )
+  {
+   for ( tileNum=0;      tileNum < pattSet->pattern[patternNum].totalTiles;     tileNum++ )
+   {
+        destroyImage( pattSet->pattern[patternNum].tile[tileNum] );
+        pattSet->pattern[patternNum].tile[tileNum]=0;
+   }
+  }
+    return 1;
 }
 
 
@@ -243,8 +258,6 @@ int seeTable(unsigned int table[8][8] ,
     {
      for (x=0; x<8; x++)
      {
-
-
       //Originally unknown piece
       table[x][y]=UNKNOWN_PIECE;
 
