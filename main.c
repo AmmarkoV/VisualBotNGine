@@ -19,8 +19,8 @@ int allowSnapshot=1;
 int allowMouseControl=1;
 
 
-unsigned int clickdelay = 10*1000;
-unsigned int delay = 25*1000;
+unsigned int clickdelay = 50*1000;
+unsigned int delay = 60*1000;
 unsigned int dontknowdelay = 100*1000;
 unsigned int mouseNeutralX = 200;
 unsigned int mouseNeutralY = 500;

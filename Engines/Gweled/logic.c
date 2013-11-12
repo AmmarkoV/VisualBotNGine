@@ -147,10 +147,10 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
         if (table[x][y]==HYPERCUBE_PIECE)
             {
                 fprintf(stderr,"Handling Hypercube @ %u,%u \n",x,y);
+                fromX = x; fromY = y; //First click is hypercube
                 unsigned int what2Link = mostPopularPiece(table);
-                getFirstPieceOfType(table,what2Link , &fromX, &fromY);
-                toX = x; toY = y;
-                score=100; //HyperCubes are nice
+                getFirstPieceOfType(table,what2Link , &toX, &toY);  //Second click is at most popular piece
+                score=100; //HyperCubes are nice , they have a good score
                 addMoveToList(list,fromX,fromY,toX,toY,score);
             } else
         //---------------------------------------------------------------------------
