@@ -23,7 +23,7 @@ int isSceneTooAmbiguous(unsigned int table[8][8])
   {
     for (x=0; x<8; x++)
     {
-       if (table[x][y]==0) { ++ambiguous; }
+       if (table[x][y]==UNKNOWN_PIECE) { ++ambiguous; }
     }
   }
 
