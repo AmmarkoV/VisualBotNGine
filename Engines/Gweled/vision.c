@@ -29,7 +29,7 @@ struct PatternItem
    unsigned char use;
    unsigned int acceptScore;
    struct Image * tile[256];
-   char * name[512];
+   char name[512];
 };
 
 struct PatternSet
@@ -67,7 +67,7 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
   set->pattern[curSetNum].use=1;
 
 
-  char * fName[512];
+  char fName[512];
   unsigned int i=0;
   while (i<255)
   {
