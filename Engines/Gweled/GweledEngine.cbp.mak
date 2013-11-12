@@ -27,7 +27,7 @@ LIB_DEBUG = $(LIB)
 LDFLAGS_DEBUG = $(LDFLAGS)
 OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
-OUT_DEBUG = ./GweledEngine.so
+OUT_DEBUG = ./libGweledEngine.so
 
 INC_RELEASE = $(INC)
 CFLAGS_RELEASE = $(CFLAGS) -O2 -fPIC
@@ -38,7 +38,7 @@ LIB_RELEASE = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS) -s
 OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
-OUT_RELEASE = ./GweledEngine.so
+OUT_RELEASE = ./libGweledEngine.so
 
 OBJ_DEBUG = $(OBJDIR_DEBUG)/__/__/ImageOperations/findSubImage.o $(OBJDIR_DEBUG)/vision.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/logic.o $(OBJDIR_DEBUG)/__/__/ImageOperations/patchComparison.o $(OBJDIR_DEBUG)/__/__/ImageOperations/imageOps.o $(OBJDIR_DEBUG)/__/__/Codecs/codecs.o $(OBJDIR_DEBUG)/__/__/Codecs/ppmInput.o $(OBJDIR_DEBUG)/__/__/Codecs/pngInput.o $(OBJDIR_DEBUG)/__/__/Codecs/jpgInput.o $(OBJDIR_DEBUG)/__/__/Codecs/jpgExiforient_embed.o $(OBJDIR_DEBUG)/__/__/Codecs/jpgExifexternal.o
 
