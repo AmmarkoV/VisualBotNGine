@@ -7,7 +7,7 @@
 
 #define PLAY_X_BEST_SOLUTIONS 3
 
-#define AUTOPLAY_AFTER_X_UNCERTAINTY 50
+#define AUTOPLAY_AFTER_X_UNCERTAINTY 40
 unsigned int continuousUncertainty=0;
 
 
