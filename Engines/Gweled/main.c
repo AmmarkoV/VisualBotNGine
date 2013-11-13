@@ -6,7 +6,7 @@
 #include "vision.h"
 
 #define PLAY_X_BEST_SOLUTIONS 3
- 
+
 #define AUTOPLAY_AFTER_X_UNCERTAINTY 40
 unsigned int continuousUncertainty=0;
 
@@ -162,7 +162,7 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
          if (continuousUncertainty>AUTOPLAY_AFTER_X_UNCERTAINTY)
          {
 
-           ourPlan->movement[1].mode = MOVE_TO_NEUTRAL;
+           ourPlan->movement[ourPlan->totalMovements].mode = MOVE_TO_NEUTRAL;
            ++ourPlan->totalMovements;
 
            unsigned int clickX=0 , clickY=0;
@@ -173,6 +173,9 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
                  ourPlan->movement[ourPlan->totalMovements].toX =   clickX+1;
                  ourPlan->movement[ourPlan->totalMovements].toY =   clickY+1;
                  ourPlan->movement[ourPlan->totalMovements].mode = SINGLE_MOVE_CLICK;
+                 ++ourPlan->totalMovements;
+
+                 ourPlan->movement[ourPlan->totalMovements].mode = MOVE_TO_NEUTRAL;
                  ++ourPlan->totalMovements;
 
                  fprintf(stderr,"Grinding play , Found Button @ %u , %u \n",clickX,clickY);

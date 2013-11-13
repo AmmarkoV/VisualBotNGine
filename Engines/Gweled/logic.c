@@ -454,7 +454,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
              {  // A B X D E
                 // X X C X X
                 fromX = x+2; fromY = y; toX = x+2; toY = y+1;
-                fprintf(stderr,"DoHypercubeUp %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
+                fprintf(stderr,"DoHypercubeUpA %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
                 score=200;
                 addMoveToList(list,fromX,fromY,toX,toY,score);
              }
@@ -472,14 +472,51 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
              {  // X X C X X
                 // A B X D E
                 fromX = x+2; fromY = y+1; toX = x+2; toY = y;
-                fprintf(stderr,"DoHypercubeUp %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
+                fprintf(stderr,"DoHypercubeUpB %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
                 score=200;
                 addMoveToList(list,fromX,fromY,toX,toY,score);
              }
+        else
+        if (
+             (x+1<limitX)&&(y+4<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
 
+             (table[x][y]==table[x][y+1])&&
+             (table[x][y]==table[x+1][y+2])&&
+             (table[x][y]==table[x][y+3])&&
+             (table[x][y]==table[x][y+4])
+           )
+             {  // X A
+                // X B
+                // C X
+                // X D
+                // X E
+                fromX = x+1; fromY = y+2; toX = x; toY = y+2;
+                fprintf(stderr,"DoHypercubeSideA %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
+                score=200;
+                addMoveToList(list,fromX,fromY,toX,toY,score);
+             }
+         else
 
+        if (
+             (x+1<limitX)&&(y+4<limitY)&&
+             (table[x+1][y]!=NO_PIECE)&&
 
-
+             (table[x+1][y]==table[x+1][y+1])&&
+             (table[x+1][y]==table[x][y+2])&&
+             (table[x+1][y]==table[x+1][y+3])&&
+             (table[x+1][y]==table[x+1][y+4])
+           )
+             {  // A X
+                // B X
+                // X C
+                // D X
+                // E X
+                fromX = x; fromY = y+2; toX = x+1; toY = y+2;
+                fprintf(stderr,"DoHypercubeSideB %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
+                score=200;
+                addMoveToList(list,fromX,fromY,toX,toY,score);
+             }
 
 
 

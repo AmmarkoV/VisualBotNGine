@@ -28,6 +28,11 @@ unsigned int dontknowdelay = 100*1000;
 signed int mouseNeutralX = -50;
 signed int mouseNeutralY = -50;
 
+//sissy foss : 619 354 ,
+//Jazz : 620 468
+unsigned int resX = 337 , resY = 382;
+
+
 void countdownDelay(int seconds)
 {
     if (seconds==0) { return; } //No delay do nothing!
@@ -39,6 +44,18 @@ void countdownDelay(int seconds)
       usleep(SECOND_USLEEP);
     }
 }
+
+
+
+
+void mouseToNeutral(unsigned int clientX,unsigned int clientY)
+{
+  char commandStr[512];
+  sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",clientX+mouseNeutralX,clientY+mouseNeutralY);
+  int retres=system(commandStr);
+  usleep(clickdelay);
+}
+
 
 
 int executePlan(struct mouseMovements * plan)
@@ -74,23 +91,19 @@ int executePlan(struct mouseMovements * plan)
           sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",plan->movement[i].fromX,plan->movement[i].fromY);
           retres=system(commandStr);
           fprintf(stderr,"Moving : Single Click OK .. ");
-          usleep(clickdelay*2);
+          usleep(clickdelay);
         break;
+        case MOVE_TO_NEUTRAL :
+          mouseToNeutral(resX,resY);
+          usleep(clickdelay*5);
+        break;
+
+
       }
     }
   }
 
   return 1;
-}
-
-
-
-void mouseToNeutral(unsigned int clientX,unsigned int clientY)
-{
-  char commandStr[512];
-  sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",clientX+mouseNeutralX,clientY+mouseNeutralY);
-  int retres=system(commandStr);
-  usleep(clickdelay);
 }
 
 
@@ -120,11 +133,6 @@ struct Image * reloadScreen(struct Image * lastImg)
 
 int main(int argc, char *argv[])
 {
-  //sissy foss : 619 354 ,
-  //Jazz : 620 468
-  unsigned int resX = 337 , resY = 382;
-
-
   int i=0;
   for (i=0; i<argc; i++)
   {
