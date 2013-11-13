@@ -215,22 +215,16 @@ int compareRGBPatchesIgnoreColor
          G1 = (*pA_PTR); ++pA_PTR;  G2 = (*pB_PTR); ++pB_PTR;
          B1 = (*pA_PTR); ++pA_PTR;  B2 = (*pB_PTR); ++pB_PTR;
 
-         if (
-              (R1!=ignoreR) && (R2!=ignoreR) &&
-              (G1!=ignoreG) && (G2!=ignoreG) &&
-              (B1!=ignoreB) && (B2!=ignoreB)
-             )
+         if ( (R1==ignoreR) && (G1==ignoreG) && (B1==ignoreB) ) { ++ignored; /*Haystack patch pixel is transparent*/ } else
+         if ( (R2==ignoreR) && (G2==ignoreG) && (B2==ignoreB) ) { ++ignored; /*Needle patch pixel is transparent*/ }   else
          {
           tmpScore+=(unsigned int) ABSDIFF(R1,R2);
           tmpScore+=(unsigned int) ABSDIFF(G1,G2);
           tmpScore+=(unsigned int) ABSDIFF(B1,B2);
-         } else
-         {
-           ++ignored;
          }
      }
 
-    //if (tmpScore>failScore+1) { *score=tmpScore; return 0; }
+    if (tmpScore>failScore+1) { *score=tmpScore; return 0; }
 
     pA_LineLimitPTR+= pAImageWidth*3;
     pA_PTR+=pA_LineSkip;

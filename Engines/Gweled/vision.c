@@ -10,7 +10,7 @@
 #include "../../Codecs/codecs.h"
 
 #define GOOD_SCORE_BELOW 500
-#define MAXIMUM_ACCEPTED_SCORE 1000
+#define MAXIMUM_ACCEPTED_SCORE 6000
 #define MAXIMUM_ACCEPTED_SCORE_FOR_BUTTONS 90000
 
 #define DUMP_PATTERN_FAILED_PATCHES 0
@@ -32,7 +32,7 @@ struct ButtonChecks
 
 
 unsigned int numberOfButtons=0;
-struct ButtonChecks buttons[15]={0};
+struct ButtonChecks buttons[64]={0};
 
 
 struct PatternItem
@@ -386,7 +386,7 @@ int initVision()
 {
   set.totalPatterns=0;
   //addToPatternSet(&set,"Engines/Gweled/Pieces/neutral",4,NO_PIECE,5000);
-  addToPatternSet(&set,"Engines/Gweled/Pieces/hypercube",HYPERCUBE_PIECE,17000);
+  addToPatternSet(&set,"Engines/Gweled/Pieces/hypercube",HYPERCUBE_PIECE,GOOD_SCORE_BELOW);
   addToPatternSet(&set,"Engines/Gweled/Pieces/yellow",YELLOW_PIECE,GOOD_SCORE_BELOW);
   addToPatternSet(&set,"Engines/Gweled/Pieces/orange",ORANGE_PIECE,GOOD_SCORE_BELOW);
   addToPatternSet(&set,"Engines/Gweled/Pieces/red",RED_PIECE,GOOD_SCORE_BELOW);

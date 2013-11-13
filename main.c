@@ -19,14 +19,16 @@ int allowSnapshot=1;
 int allowMouseControl=1;
 int totalNotMoves=0;
 
-
+//Various delays , confiurable via commandline parameters
 unsigned int clickdelay = 50*1000;
 unsigned int delay = 70*1000;
 unsigned int dontknowdelay = 100*1000;
 
-
+//These are the coordinates that we want the mouse to go at
+//when we dont want it to interact with our game
 signed int mouseNeutralX = -50;
 signed int mouseNeutralY = -50;
+
 
 //sissy foss : 619 354 ,
 //Jazz : 620 468
@@ -97,8 +99,6 @@ int executePlan(struct mouseMovements * plan)
           mouseToNeutral(resX,resY);
           usleep(clickdelay*5);
         break;
-
-
       }
     }
   }
@@ -153,11 +153,8 @@ int main(int argc, char *argv[])
     countdownDelay(0);
     fprintf(stderr,"Starting Up\n");
 
-
-
     struct Image * haystack = reloadScreen(0);
     struct Image * needle = readImage("seek.pnm",PNM_CODEC,0);
-
 
     /*
     if (
@@ -189,10 +186,10 @@ int main(int argc, char *argv[])
       fprintf(stderr,"Round %u \n",iterations);
       ++iterations;
 
-          unsigned int  possibleMoves= thinkWhatToPlay(
+       unsigned int  possibleMoves= thinkWhatToPlay(
                                                         haystack->pixels,  haystack->width , haystack->height ,
                                                         resX , resY ,  &ourPlan
-                                                      );
+                                                   );
 
        if ( possibleMoves==0 )
           {
@@ -204,7 +201,6 @@ int main(int argc, char *argv[])
             else
           {
             executePlan(&ourPlan);
-            //mouseToNeutral();
           }
 
       usleep(delay);

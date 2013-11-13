@@ -7,6 +7,7 @@
 
 #define PLAY_X_BEST_SOLUTIONS 3
 
+#define AUTO_REPLAY 1
 #define AUTOPLAY_AFTER_X_UNCERTAINTY 40
 unsigned int continuousUncertainty=0;
 
@@ -112,6 +113,7 @@ int formulatePlan(unsigned int table[8][8] , struct solutionList * list , struct
             (list->solution[i].toY<8)
             )
         {
+           printf("Move %u,%u to %u,%u\n",list->solution[i].fromX,list->solution[i].fromY,list->solution[i].toX,list->solution[i].toY);
            ourPlan->movement[mC].fromX = settings.clientX + halfBlockX + ( list->solution[i].fromX * settings.blockX);
            ourPlan->movement[mC].fromY = settings.clientY + halfBlockY + ( list->solution[i].fromY * settings.blockY);
            ourPlan->movement[mC].toX =   settings.clientX + halfBlockX + ( list->solution[i].toX * settings.blockY);
@@ -159,9 +161,8 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
          ++continuousUncertainty;
          printf("Scene is too ambiguous :( ( %u / %u ) \n", continuousUncertainty , AUTOPLAY_AFTER_X_UNCERTAINTY);
 
-         if (continuousUncertainty>AUTOPLAY_AFTER_X_UNCERTAINTY)
+         if ( (AUTO_REPLAY) && (continuousUncertainty>AUTOPLAY_AFTER_X_UNCERTAINTY) )
          {
-
            ourPlan->movement[ourPlan->totalMovements].mode = MOVE_TO_NEUTRAL;
            ++ourPlan->totalMovements;
 
