@@ -119,10 +119,15 @@ struct Image * reloadScreen(struct Image * lastImg)
 
 int main(int argc, char *argv[])
 {
+  //sissy foss : 619 354 ,
+  //Jazz : 620 468
+  unsigned int resX = 337 , resY = 382;
+
 
   int i=0;
   for (i=0; i<argc; i++)
   {
+    if (strcasecmp(argv[i],"-clientXY")==0) { resX=atoi(argv[i+1]); resY=atoi(argv[i+2]);  fprintf(stderr,"client set to %u %u \n",resX,resY); } else
     if (strcasecmp(argv[i],"-doNotMove")==0) { allowMouseControl=0; fprintf(stderr,"Deactivated mouse control\n"); } else
     if (strcasecmp(argv[i],"-doNotGrab")==0) { allowSnapshot=0; fprintf(stderr,"Deactivated screen grabbing \n"); } else
     if (strcasecmp(argv[i],"-clickDelay")==0) { clickdelay=atoi(argv[i+1])*1000; fprintf(stderr,"Set click delay to %u\n",clickdelay); } else
@@ -142,9 +147,6 @@ int main(int argc, char *argv[])
     struct Image * haystack = reloadScreen(0);
     struct Image * needle = readImage("seek.pnm",PNM_CODEC,0);
 
-    //sissy foss : 619 354 ,
-    //Jazz : 620 468
-    unsigned int resX = 337 , resY = 382;
 
     /*
     if (
