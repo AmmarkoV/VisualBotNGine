@@ -357,7 +357,7 @@ int seeButtons( unsigned char * screen , unsigned int screenWidth ,unsigned int 
        fprintf(stderr,"Compared Button %u , score %u \n",buttonNum,currentScore);
 
 
-      if (currentScore<70000)
+      if (currentScore<90000)
       {
         fprintf(stderr,"Button %u Matches\n",buttonNum);
         *clickX = (unsigned int) sX + buttons[buttonNum].buttonsImg->width/2;
