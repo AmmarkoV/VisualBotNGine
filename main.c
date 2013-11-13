@@ -74,7 +74,7 @@ int executePlan(struct mouseMovements * plan)
           sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",plan->movement[i].fromX,plan->movement[i].fromY);
           retres=system(commandStr);
           fprintf(stderr,"Moving : Single Click OK .. ");
-          usleep(clickdelay);
+          usleep(clickdelay*2);
         break;
       }
     }
