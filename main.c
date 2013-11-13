@@ -21,11 +21,11 @@ int totalNotMoves=0;
 
 
 unsigned int clickdelay = 50*1000;
-unsigned int delay = 60*1000;
+unsigned int delay = 70*1000;
 unsigned int dontknowdelay = 100*1000;
 
 
-signed int mouseNeutralX = 137;
+signed int mouseNeutralX = 57;
 signed int mouseNeutralY = 118;
 
 void countdownDelay(int seconds)
@@ -127,6 +127,8 @@ int main(int argc, char *argv[])
   int i=0;
   for (i=0; i<argc; i++)
   {
+    if (strcasecmp(argv[i],"-clickdelay")==0) { clickdelay=1000*atoi(argv[i+1]);  fprintf(stderr,"clickdelay set to %u milliseconds \n",clickdelay); } else
+    if (strcasecmp(argv[i],"-delay")==0) { delay=1000*atoi(argv[i+1]);  fprintf(stderr,"delay set to %u milliseconds \n",delay); } else
     if (strcasecmp(argv[i],"-clientXY")==0) { resX=atoi(argv[i+1]); resY=atoi(argv[i+2]);  fprintf(stderr,"client set to %u %u \n",resX,resY); } else
     if (strcasecmp(argv[i],"-doNotMove")==0) { allowMouseControl=0; fprintf(stderr,"Deactivated mouse control\n"); } else
     if (strcasecmp(argv[i],"-doNotGrab")==0) { allowSnapshot=0; fprintf(stderr,"Deactivated screen grabbing \n"); } else
