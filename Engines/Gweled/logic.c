@@ -438,6 +438,55 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
              }
         //---------------------------------------------------------------------------
 
+
+              /* Hypercube creation */
+              else
+
+        if (
+             (x+4<limitX)&&(y+1<limitY)&&
+             (table[x][y+1]!=NO_PIECE)&&
+
+             (table[x][y+1]==table[x+1][y+1])&&
+             (table[x][y+1]==table[x+2][y])&&
+             (table[x][y+1]==table[x+3][y+1])&&
+             (table[x][y+1]==table[x+4][y+1])
+           )
+             {  // A B X D E
+                // X X C X X
+                fromX = x+2; fromY = y; toX = x+2; toY = y+1;
+                fprintf(stderr,"DoHypercubeUp %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
+                score=200;
+                addMoveToList(list,fromX,fromY,toX,toY,score);
+             }
+             else
+
+        if (
+             (x+4<limitX)&&(y+1<limitY)&&
+             (table[x][y]!=NO_PIECE)&&
+
+             (table[x][y]==table[x+1][y])&&
+             (table[x][y]==table[x+2][y+1])&&
+             (table[x][y]==table[x+3][y])&&
+             (table[x][y]==table[x+4][y])
+           )
+             {  // X X C X X
+                // A B X D E
+                fromX = x+2; fromY = y+1; toX = x+2; toY = y;
+                fprintf(stderr,"DoHypercubeUp %u,%u -> %u,%u \n",fromX,fromY,toX,toY);
+                score=200;
+                addMoveToList(list,fromX,fromY,toX,toY,score);
+             }
+
+
+
+
+
+
+
+
+
+
+
      }
     }
 
