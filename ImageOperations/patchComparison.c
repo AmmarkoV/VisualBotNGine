@@ -230,7 +230,7 @@ int compareRGBPatchesIgnoreColor
          }
      }
 
-    if (tmpScore>failScore) { *score=tmpScore; return 0;}
+    //if (tmpScore>failScore+1) { *score=tmpScore; return 0; }
 
     pA_LineLimitPTR+= pAImageWidth*3;
     pA_PTR+=pA_LineSkip;
