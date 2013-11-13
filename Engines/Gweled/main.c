@@ -201,6 +201,9 @@ int initializeEngine(char * settingsStr)
 {
     if ( strcasecmp(settingsStr,"bejeweled blitz")==0 )
     {
+      //sissy foss : 650 354 ,
+      //Jazz : 620 468
+
       settings.clientX = 337;
       settings.clientY = 382;
       settings.blockX = 40;

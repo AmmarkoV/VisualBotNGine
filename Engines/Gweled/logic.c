@@ -82,6 +82,57 @@ unsigned int getFirstPieceOfType(unsigned int table[8][8] , unsigned int pieceTy
  return 0;
 }
 
+unsigned int getInstancesOfPiece(unsigned int table[8][8],unsigned int pieceKind)
+{
+  unsigned int instancesOfPiece=0;
+
+  unsigned int x,y;
+  for (y=0; y<8; y++)
+  {
+    for (x=0; x<8; x++)
+    {
+       if (table[x][y]==pieceKind)
+         {
+           ++instancesOfPiece;
+         }
+    }
+  }
+
+
+  return instancesOfPiece;
+}
+
+
+
+unsigned int getMostPopularNeighboringPiece(unsigned int table[8][8] ,  unsigned int * posX, unsigned int * posY)
+{
+
+  unsigned int cX,cY,sX,sY,eX,eY;
+  cX=*posX; cY=*posY;
+  sX=*posX;   if (sX > 0) { sX-=1; }
+  sY=*posY;   if (sY > 0) { sY-=1; }
+  eX=*posX;   if (eX > 0) { eX+=1; }
+  eY=*posY;   if (eY > 0) { eY+=1; }
+
+  unsigned int foundSomething=0;
+  unsigned int bestScore = 0;
+  unsigned int currentScore = 0;
+  unsigned int x,y;
+  for (y=sY; y<eY; y++)
+  {
+    for (x=sX; x<eX; x++)
+    {
+       if (table[x][y]!=UNKNOWN_PIECE)
+         {
+           currentScore =getInstancesOfPiece(table,table[x][y]);
+           if (currentScore>=bestScore) { bestScore = currentScore; *posX=x; *posY=y; foundSomething=1;}
+         }
+    }
+  }
+ return foundSomething;
+}
+
+
 
 int addMoveToList(struct solutionList * list ,  unsigned int fromX,unsigned int fromY , unsigned int toX, unsigned int toY , unsigned int score)
 {
@@ -148,8 +199,7 @@ int getValidMoves(unsigned int table[8][8] , struct solutionList * list)
             {
                 fprintf(stderr,"Handling Hypercube @ %u,%u \n",x,y);
                 fromX = x; fromY = y; //First click is hypercube
-                unsigned int what2Link = mostPopularPiece(table);
-                getFirstPieceOfType(table,what2Link , &toX, &toY);  //Second click is at most popular piece
+                getMostPopularNeighboringPiece(table,&toX,&toY);
                 score=100; //HyperCubes are nice , they have a good score
                 addMoveToList(list,fromX,fromY,toX,toY,score);
             } else
