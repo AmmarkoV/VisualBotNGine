@@ -425,7 +425,10 @@ int initVision()
   buttons[numberOfButtons].checkY = (signed int) 790 - 382;
   if (buttons[numberOfButtons].buttonsImg!=0) { ++numberOfButtons; }
 
-
+  buttons[numberOfButtons].buttonsImg=readImage("Engines/Gweled/Menus/continueButton.pnm",PNM_CODEC,0);
+  buttons[numberOfButtons].checkX = (signed int) 580 - 337;
+  buttons[numberOfButtons].checkY = (signed int) 682 - 382;
+  if (buttons[numberOfButtons].buttonsImg!=0) { ++numberOfButtons; }
 
 
   return 1;
