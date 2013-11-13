@@ -11,6 +11,7 @@
 
 #define GOOD_SCORE_BELOW 500
 #define MAXIMUM_ACCEPTED_SCORE 1000
+#define MAXIMUM_ACCEPTED_SCORE_FOR_BUTTONS 90000
 
 #define DUMP_PATTERN_FAILED_PATCHES 0
 #define DUMP_UNKNOWN_PATCHES 0
@@ -187,7 +188,8 @@ int compareTableTile(struct PatternSet * pattSet ,
                                      /*Patch Size*/
                                      width, height ,
                                      /*Return score*/
-                                     &currentScore
+                                     &currentScore ,
+                                     MAXIMUM_ACCEPTED_SCORE
                                     );
 
 
@@ -353,12 +355,13 @@ int seeButtons( unsigned char * screen , unsigned int screenWidth ,unsigned int 
                                      buttons[buttonNum].buttonsImg->width,
                                      buttons[buttonNum].buttonsImg->height ,
                                      /*Return score*/
-                                     &currentScore
+                                     &currentScore ,
+                                     MAXIMUM_ACCEPTED_SCORE_FOR_BUTTONS
                                     );
        fprintf(stderr,"Compared Button %u , score %u \n",buttonNum,currentScore);
 
 
-      if (currentScore<90000)
+      if (currentScore<MAXIMUM_ACCEPTED_SCORE_FOR_BUTTONS)
       {
         fprintf(stderr,"Button %u Matches\n",buttonNum);
         *clickX = (unsigned int) sX + buttons[buttonNum].buttonsImg->width/2;
