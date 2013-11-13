@@ -23,9 +23,10 @@ int totalNotMoves=0;
 unsigned int clickdelay = 50*1000;
 unsigned int delay = 60*1000;
 unsigned int dontknowdelay = 100*1000;
-unsigned int mouseNeutralX = 200;
-unsigned int mouseNeutralY = 500;
 
+
+signed int mouseNeutralX = 137;
+signed int mouseNeutralY = 118;
 
 void countdownDelay(int seconds)
 {
@@ -84,10 +85,10 @@ int executePlan(struct mouseMovements * plan)
 
 
 
-void mouseToNeutral()
+void mouseToNeutral(unsigned int clientX,unsigned int clientY)
 {
   char commandStr[512];
-  sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",mouseNeutralX,mouseNeutralY);
+  sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",clientX+mouseNeutralX,clientY+mouseNeutralY);
   int retres=system(commandStr);
 }
 
@@ -141,7 +142,9 @@ int main(int argc, char *argv[])
     struct Image * haystack = reloadScreen(0);
     struct Image * needle = readImage("seek.pnm",PNM_CODEC,0);
 
-    unsigned int resX = 0 , resY = 0;
+    //sissy foss : 619 354 ,
+    //Jazz : 620 468
+    unsigned int resX = 337 , resY = 382;
 
     /*
     if (
@@ -182,7 +185,7 @@ int main(int argc, char *argv[])
           {
             fprintf(stderr,"Can't think of a move to play\n");
             ++totalNotMoves;
-            if (totalNotMoves%10==0) { mouseToNeutral(); }
+            if (totalNotMoves%20==0) { mouseToNeutral(resX,resY); }
             usleep(dontknowdelay);
           }
             else

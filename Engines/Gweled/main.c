@@ -137,8 +137,8 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
                     struct mouseMovements * ourPlan )
 {
     unsigned int resX = clientStartX , resY = clientStartY;
-    //settings.clientX = clientStartX;
-    //settings.clientY = clientStartY;
+    settings.clientX = clientStartX;
+    settings.clientY = clientStartY;
 
 
     unsigned int table[8][8]={0};
@@ -201,7 +201,7 @@ int initializeEngine(char * settingsStr)
 {
     if ( strcasecmp(settingsStr,"bejeweled blitz")==0 )
     {
-      //sissy foss : 650 354 ,
+      //sissy foss : 619 354 ,
       //Jazz : 620 468
 
       settings.clientX = 337;
