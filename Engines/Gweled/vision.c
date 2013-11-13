@@ -431,6 +431,13 @@ int initVision()
   if (buttons[numberOfButtons].buttonsImg!=0) { ++numberOfButtons; }
 
 
+  buttons[numberOfButtons].buttonsImg=readImage("Engines/Gweled/Menus/cancelButton.pnm",PNM_CODEC,0);
+  buttons[numberOfButtons].checkX = (signed int) 743 - 619;
+  buttons[numberOfButtons].checkY = (signed int) 782 - 354;
+  if (buttons[numberOfButtons].buttonsImg!=0) { ++numberOfButtons; }
+
+
+
   return 1;
 }
 
