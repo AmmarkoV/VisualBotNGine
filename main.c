@@ -68,7 +68,12 @@ int executePlan(struct mouseMovements * plan)
           retres=system(commandStr);
           fprintf(stderr,"To OK \n");
         break;
-
+        case SINGLE_MOVE_CLICK :
+          sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",plan->movement[i].fromX,plan->movement[i].fromY);
+          retres=system(commandStr);
+          fprintf(stderr,"Moving : Single Click OK .. ");
+          usleep(clickdelay);
+        break;
       }
     }
   }
@@ -175,6 +180,7 @@ int main(int argc, char *argv[])
        if ( possibleMoves==0 )
           {
             fprintf(stderr,"Can't think of a move to play\n");
+             mouseToNeutral();
             usleep(dontknowdelay);
           }
             else

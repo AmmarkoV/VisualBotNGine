@@ -22,6 +22,18 @@ unsigned int patternAssignments = 0;
 unsigned int singlePixelAssignmentsTotal = 0;
 unsigned int patternAssignmentsTotal = 0;
 
+struct ButtonChecks
+{
+   struct Image * buttonsImg;
+   signed int checkX;
+   signed int checkY;
+};
+
+
+unsigned int numberOfButtons=0;
+struct ButtonChecks buttons[15]={0};
+
+
 struct PatternItem
 {
    unsigned int totalTiles;
@@ -314,6 +326,58 @@ int seeTable(unsigned int table[8][8] ,
 }
 
 
+
+
+
+int seeButtons( unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight , unsigned int * clickX , unsigned int * clickY )
+{
+  unsigned int currentScore=10000000;
+  unsigned int buttonNum = 0;
+   for ( buttonNum=0;    buttonNum < numberOfButtons;     buttonNum++ )
+   {
+       fprintf(stderr,"Comparing Button %u \n",buttonNum);
+       unsigned int sX = settings.clientX + buttons[buttonNum].checkX;
+       unsigned int sY = settings.clientY + buttons[buttonNum].checkY;
+       fprintf(stderr,"%u,%u size %ux%u \n", sX ,  sY , buttons[buttonNum].buttonsImg->width , buttons[buttonNum].buttonsImg->height);
+       compareRGBPatchesIgnoreColor(
+                                     /*Main Image*/
+                                     screen , sX ,  sY , screenWidth, screenHeight ,
+                                     /*Specific Tile*/
+                                     buttons[buttonNum].buttonsImg->pixels , 0,  0 ,
+                                     buttons[buttonNum].buttonsImg->width ,
+                                     buttons[buttonNum].buttonsImg->height,
+                                     /*Ignore R , G , B */
+                                     123,123,0,
+                                     /*Patch Size*/
+                                     buttons[buttonNum].buttonsImg->width,
+                                     buttons[buttonNum].buttonsImg->height ,
+                                     /*Return score*/
+                                     &currentScore
+                                    );
+       fprintf(stderr,"Compared Button %u , score %u \n",buttonNum,currentScore);
+
+
+      if (currentScore<70000)
+      {
+        fprintf(stderr,"Button %u Matches\n",buttonNum);
+        *clickX = (unsigned int) sX + buttons[buttonNum].buttonsImg->width/2;
+        *clickY = (unsigned int) sY + buttons[buttonNum].buttonsImg->height/2;
+        return 1;
+      }
+   }
+  fprintf(stderr,"No Button Matches\n");
+
+  return 0;
+}
+
+
+
+
+
+
+
+
+
 int initVision()
 {
   set.totalPatterns=0;
@@ -326,9 +390,37 @@ int initVision()
   addToPatternSet(&set,"Engines/Gweled/Pieces/green",GREEN_PIECE,GOOD_SCORE_BELOW);
   addToPatternSet(&set,"Engines/Gweled/Pieces/pink",PINK_PIECE,GOOD_SCORE_BELOW);
   addToPatternSet(&set,"Engines/Gweled/Pieces/white",WHITE_PIECE,GOOD_SCORE_BELOW);
+  dumpPatternSet(&set,"Initialization");
 // exit(0);
 
-  dumpPatternSet(&set,"Initialization");
+  numberOfButtons=0;
+  buttons[numberOfButtons].buttonsImg=readImage("Engines/Gweled/Menus/xButton.pnm",PNM_CODEC,0);
+  //buttons[numberOfButtons].checkX = (signed int) 827-settings.clientX;
+  //buttons[numberOfButtons].checkY = (signed int) 441-settings.clientY;
+  buttons[numberOfButtons].checkX = (signed int) 827 - 337;
+  buttons[numberOfButtons].checkY = (signed int) 441 - 382;
+  if (buttons[numberOfButtons].buttonsImg!=0) { ++numberOfButtons; }
+
+  buttons[numberOfButtons].buttonsImg=readImage("Engines/Gweled/Menus/playButton.pnm",PNM_CODEC,0);
+  buttons[numberOfButtons].checkX =  (signed int) 251 - 337;
+  buttons[numberOfButtons].checkY =  (signed int) 583 - 382;
+  if (buttons[numberOfButtons].buttonsImg!=0) { ++numberOfButtons; }
+
+  buttons[numberOfButtons].buttonsImg=readImage("Engines/Gweled/Menus/playNowButton.pnm",PNM_CODEC,0);
+  buttons[numberOfButtons].checkX = (signed int) 379 - 337 ;
+  buttons[numberOfButtons].checkY = (signed int) 672 - 382;
+  if (buttons[numberOfButtons].buttonsImg!=0) { ++numberOfButtons; }
+
+  buttons[numberOfButtons].buttonsImg=readImage("Engines/Gweled/Menus/noThanks.pnm",PNM_CODEC,0);
+  buttons[numberOfButtons].checkX = (signed int) 308 - 337 ;
+  buttons[numberOfButtons].checkY = (signed int) 697 - 382;
+  if (buttons[numberOfButtons].buttonsImg!=0) { ++numberOfButtons; }
+
+  buttons[numberOfButtons].buttonsImg=readImage("Engines/Gweled/Menus/playAgain.pnm",PNM_CODEC,0);
+  buttons[numberOfButtons].checkX = (signed int) 311 - 337;
+  buttons[numberOfButtons].checkY = (signed int) 790 - 382;
+  if (buttons[numberOfButtons].buttonsImg!=0) { ++numberOfButtons; }
+
 
 
 

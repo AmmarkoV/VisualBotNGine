@@ -7,6 +7,8 @@
 
 #define PLAY_X_BEST_SOLUTIONS 3
 
+#define AUTOPLAY_AFTER_X_UNCERTAINTY 35
+unsigned int continuousUncertainty=0;
 
 
 struct gweledSettings settings={0};
@@ -153,7 +155,32 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
 
     if ( isSceneTooAmbiguous(table) )
        {
-         printf("Scene is too ambiguous :(\nWaiting..\n");
+         ourPlan->totalMovements=0;
+         ++continuousUncertainty;
+         printf("Scene is too ambiguous :( ( %u / %u ) \n", continuousUncertainty , AUTOPLAY_AFTER_X_UNCERTAINTY);
+
+         if (continuousUncertainty>AUTOPLAY_AFTER_X_UNCERTAINTY)
+         {
+
+           ourPlan->movement[1].mode = MOVE_TO_NEUTRAL;
+           ++ourPlan->totalMovements;
+
+           unsigned int clickX=0 , clickY=0;
+           if ( seeButtons( screen ,  screenWidth , screenHeight  , &clickX , &clickY) )
+              {
+                 ourPlan->movement[ourPlan->totalMovements].fromX = clickX;
+                 ourPlan->movement[ourPlan->totalMovements].fromY = clickY;
+                 ourPlan->movement[ourPlan->totalMovements].toX =   clickX+1;
+                 ourPlan->movement[ourPlan->totalMovements].toY =   clickY+1;
+                 ourPlan->movement[ourPlan->totalMovements].mode = SINGLE_MOVE_CLICK;
+                 ++ourPlan->totalMovements;
+
+                 fprintf(stderr,"Grinding play , Found Button @ %u , %u \n",clickX,clickY);
+                 return 1;
+              }
+         }
+
+
          return 0;
        }
 
@@ -165,7 +192,7 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
 
     unsigned int totalSolutions = formulatePlan(table , &list ,ourPlan);
 
-
+    continuousUncertainty=0;
     return totalSolutions;
 }
 
