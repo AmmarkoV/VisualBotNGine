@@ -25,8 +25,8 @@ unsigned int delay = 70*1000;
 unsigned int dontknowdelay = 100*1000;
 
 
-signed int mouseNeutralX = 57;
-signed int mouseNeutralY = 118;
+signed int mouseNeutralX = -50;
+signed int mouseNeutralY = -50;
 
 void countdownDelay(int seconds)
 {
@@ -90,6 +90,7 @@ void mouseToNeutral(unsigned int clientX,unsigned int clientY)
   char commandStr[512];
   sprintf(commandStr,"xdotool mousemove --sync %u %u click 1",clientX+mouseNeutralX,clientY+mouseNeutralY);
   int retres=system(commandStr);
+  usleep(clickdelay);
 }
 
 
