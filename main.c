@@ -17,6 +17,7 @@
 
 int allowSnapshot=1;
 int allowMouseControl=1;
+int totalNotMoves=0;
 
 
 unsigned int clickdelay = 50*1000;
@@ -180,7 +181,8 @@ int main(int argc, char *argv[])
        if ( possibleMoves==0 )
           {
             fprintf(stderr,"Can't think of a move to play\n");
-             mouseToNeutral();
+            ++totalNotMoves;
+            if (totalNotMoves%10==0) { mouseToNeutral(); }
             usleep(dontknowdelay);
           }
             else
