@@ -339,7 +339,8 @@ int seeButtons( unsigned char * screen , unsigned int screenWidth ,unsigned int 
        unsigned int sX = settings.clientX + buttons[buttonNum].checkX;
        unsigned int sY = settings.clientY + buttons[buttonNum].checkY;
        fprintf(stderr,"%u,%u size %ux%u \n", sX ,  sY , buttons[buttonNum].buttonsImg->width , buttons[buttonNum].buttonsImg->height);
-       compareRGBPatchesIgnoreColor(
+       compareRGBPatchesNeighborhoodIgnoreColor(
+                                     3,3, //Neighborhood
                                      /*Main Image*/
                                      screen , sX ,  sY , screenWidth, screenHeight ,
                                      /*Specific Tile*/

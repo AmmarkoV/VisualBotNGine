@@ -161,7 +161,8 @@ int compareRGBPatchesIgnoreColor
                        unsigned char * patchBRGB , unsigned int pBCX,  unsigned int pBCY , unsigned int pBImageWidth , unsigned int pBImageHeight ,
                        unsigned char ignoreR , unsigned char ignoreG , unsigned char ignoreB ,
                        unsigned int patchWidth, unsigned int patchHeight  ,
-                       unsigned int * score
+                       unsigned int * score,
+                       unsigned int  failScore
                      )
 {
   if ( (patchARGB==0)||(patchBRGB==0) ) { return 0; }
@@ -228,6 +229,9 @@ int compareRGBPatchesIgnoreColor
            ++ignored;
          }
      }
+
+    if (tmpScore>failScore) { *score=tmpScore; return 0;}
+
     pA_LineLimitPTR+= pAImageWidth*3;
     pA_PTR+=pA_LineSkip;
     pB_PTR+=pB_LineSkip;
@@ -240,7 +244,49 @@ int compareRGBPatchesIgnoreColor
 }
 
 
+int compareRGBPatchesNeighborhoodIgnoreColor
+                     (
+                       unsigned int neighborhoodX , unsigned int neighborhoodY ,
+                       unsigned char * patchARGB , unsigned int pACX,  unsigned int pACY , unsigned int pAImageWidth , unsigned int pAImageHeight ,
+                       unsigned char * patchBRGB , unsigned int pBCX,  unsigned int pBCY , unsigned int pBImageWidth , unsigned int pBImageHeight ,
+                       unsigned char ignoreR , unsigned char ignoreG , unsigned char ignoreB ,
+                       unsigned int patchWidth, unsigned int patchHeight  ,
+                       unsigned int * score ,
+                       unsigned int  failScore
+                     )
+{
 
+    unsigned int xS,yS;
+    xS=pACX;  if (xS>neighborhoodX) { xS=xS-neighborhoodX; } else { xS=0; }
+    yS=pACY;  if (yS>neighborhoodY) { yS=yS-neighborhoodY; } else { yS=0; }
+
+    unsigned int xE,yE;
+    xE=pACX;  if (xE+neighborhoodX<pAImageWidth )  { xE=xE+neighborhoodX; }
+    yE=pACY;  if (yE+neighborhoodY<pAImageHeight ) { yE=yE+neighborhoodY; }
+
+    unsigned int bestScore=failScore+1;
+    unsigned int currentScore=0;
+
+    unsigned int x,y;
+    for (y=yS; y<yE; y++)
+    {
+      for (x=xS; x<xE; x++)
+       {
+           compareRGBPatchesIgnoreColor
+                     ( patchARGB , x,  y , pAImageWidth , pAImageHeight ,
+                       patchBRGB , pBCX,  pBCY , pBImageWidth , pBImageHeight ,
+                       ignoreR , ignoreG , ignoreB ,
+                       patchWidth, patchHeight  ,
+                       &currentScore ,
+                       failScore
+                     );
+            if (currentScore<bestScore) { bestScore=currentScore; }
+       }
+    }
+
+   *score=bestScore;
+   return (bestScore<failScore);
+}
 
 
 
