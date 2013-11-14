@@ -21,7 +21,6 @@ enum gweledPieces
   RED_PIECE ,
   PINK_PIECE ,
   HYPERCUBE_PIECE ,
-  EMPTY_PIECE ,
   //-------------------------
   NUMBER_OF_VALID_PIECES
 };

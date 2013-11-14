@@ -38,7 +38,7 @@ char * getPieceName(int pieceVal)
     case RED_PIECE : return "RED_PIECE";   break;
     case PINK_PIECE : return "PINK_PIECE";   break;
     case HYPERCUBE_PIECE : return "HYPERCUBE_PIECE";   break;
-    case EMPTY_PIECE : return "EMPTY_PIECE";   break;
+   // case EMPTY_PIECE : return "EMPTY_PIECE";   break;
     default :
      return "UNKNOWN";
     break;
@@ -58,7 +58,7 @@ int writePieceChar(int pieceVal)
     case RED_PIECE : printf(RED " R" NORMAL);  break;
     case PINK_PIECE : printf(MAGENTA " P" NORMAL);  break;
     case HYPERCUBE_PIECE : printf(MAGENTA " #" NORMAL);  break;
-    case EMPTY_PIECE : printf(MAGENTA " ." NORMAL);  break;
+    //case EMPTY_PIECE : printf(MAGENTA " ." NORMAL);  break;
     default :
      printf(" ?" );
     break;
