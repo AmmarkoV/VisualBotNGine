@@ -23,6 +23,10 @@ unsigned int patternAssignments = 0;
 unsigned int singlePixelAssignmentsTotal = 0;
 unsigned int patternAssignmentsTotal = 0;
 
+
+unsigned int seeFunctionCalls=0;
+
+
 struct ButtonChecks
 {
    struct Image * buttonsImg;
@@ -141,15 +145,13 @@ int emptyPatternSet(struct PatternSet * pattSet)
 }
 
 
-unsigned int seeFunctionCalls=0;
-
 
 int compareTableTile(struct PatternSet * pattSet ,
                      unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
                      unsigned int sX,unsigned int sY , unsigned int width ,unsigned int height , unsigned int * pick)
 {
    #if NO_PATCH_COMPARISON
-     return 0; //Disabled until it is fixed
+     return 0; //We may not want patch comparison
    #endif // NO_PATCH_COMPARISON
 
 
