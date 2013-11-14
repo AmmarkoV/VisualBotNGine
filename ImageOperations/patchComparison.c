@@ -183,32 +183,25 @@ int compareRGBPatchesIgnoreColor
   if ( (patchWidth==0)||(patchHeight==0) ) { return 0; }
   //----------------------------------------------------------
 
-  //fprintf(stderr,"imageA ( %u,%u ) - imageB ( %u,%u ) \n",pAImageWidth,pAImageHeight,pBImageWidth,pBImageHeight);
-
-  /*
-  fprintf(stderr,"compareRGBPatchesIgnore ( %u,%u -> %u,%u ) vs ( %u,%u -> %u,%u )  patch %u,%u \n",pACX,pACY,pACX+patchWidth,pACY+patchHeight,
-                                                                                              pBCX,pBCY,pBCX+patchWidth,pBCY+patchHeight,
-                                                                                              patchWidth,patchHeight
-                                                                                              );*/
-
   unsigned char * pA_PTR      = patchARGB+ MEMPLACE3(pACX,pACY,pAImageWidth);
   unsigned char * pA_LimitPTR = patchARGB+ MEMPLACE3((pACX+patchWidth),(pACY+patchHeight),pAImageWidth);
   unsigned int pA_LineSkip = (pAImageWidth-patchWidth)*3 ;
   unsigned char * pA_LineLimitPTR = pA_PTR + (patchWidth*3);
 
   unsigned char * pB_PTR      = patchBRGB + MEMPLACE3(pBCX,pBCY,pBImageWidth);
-  //unsigned char * pB_LimitPTR = patchBRGB + MEMPLACE3((pBCX+patchWidth),(pBCY+patchHeight),pBImageWidth); // <- IS THIS OK ? or are they *2
   unsigned int pB_LineSkip = (pBImageWidth-patchWidth)*3 ;
 
   unsigned int tmpScore = 0;
 
-  //fprintf(stderr,"pA_PTR = %u , pA_LimitPTR = %u , pA_LineSkip = %u , pA_LineLimitPTR = %u \n",pA_PTR,pA_LimitPTR,pA_LineSkip,pA_LineLimitPTR);
-  //fprintf(stderr,"pB_PTR = %u , pB_LineSkip = %u \n",pB_PTR,pB_LineSkip);
+
   unsigned char R1,G1,B1,R2,G2,B2;
   unsigned int ignored=0;
 
   while (pA_PTR < pA_LimitPTR)
   {
+   //fprintf(stderr,"pA_PTR = %u , pA_LimitPTR = %u , pA_LineSkip = %u , pA_LineLimitPTR = %u \n",pA_PTR,pA_LimitPTR,pA_LineSkip,pA_LineLimitPTR);
+   //fprintf(stderr,"pB_PTR = %u , pB_LineSkip = %u \n",pB_PTR,pB_LineSkip);
+
      while (pA_PTR < pA_LineLimitPTR)
      {
          R1 = (*pA_PTR); ++pA_PTR;  R2 = (*pB_PTR); ++pB_PTR;
@@ -224,7 +217,7 @@ int compareRGBPatchesIgnoreColor
          }
      }
 
-    if (tmpScore>failScore+1) { *score=tmpScore; return 0; }
+    if (tmpScore>failScore+1) { *score=tmpScore; return 1; }
 
     pA_LineLimitPTR+= pAImageWidth*3;
     pA_PTR+=pA_LineSkip;

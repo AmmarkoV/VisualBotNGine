@@ -13,9 +13,12 @@
 #define MAXIMUM_ACCEPTED_SCORE 6000
 #define MAXIMUM_ACCEPTED_SCORE_FOR_BUTTONS 90000
 
-#define DUMP_PATTERN_FAILED_PATCHES 0
+#define DUMP_LOADED_PATTERN_SET 0
+#define DUMP_PATTERN_FAILED_PATCHES 1
 #define DUMP_UNKNOWN_PATCHES 0
 #define NO_PATCH_COMPARISON 0
+
+#define USE_SINGLE_PIXEL_FALLBACK 0
 
 
 unsigned int singlePixelAssignments = 0;
@@ -96,7 +99,6 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
         if (set->pattern[curSetNum].tile[totalTiles]!=0)
         {
           fprintf(stderr,"Loaded %s , we now have %u patterns for set %u\n",fName, totalTiles , curSetNum);
-          //It appears we correctly loaded a new pattern file
           ++totalTiles;
         }
       } else
@@ -112,8 +114,11 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
 
 int dumpPatternSet(struct PatternSet * pattSet ,char * stage)
 {
- fprintf(stderr,"dumping Pattern sets deactivated\n");
- return 0;
+ #if !DUMP_LOADED_PATTERN_SET
+  fprintf(stderr,"dumping Pattern sets deactivated\n");
+  return 0;
+ #endif
+
  unsigned int tileNum=0;
  unsigned int patternNum=0;
  char fName[512];
@@ -157,7 +162,7 @@ int compareTableTile(struct PatternSet * pattSet ,
 
    unsigned int currentScore=10000000;
    unsigned int bestScore=10000000;
-   unsigned int bestPick=NO_PIECE;
+   unsigned int bestPick=UNKNOWN_PIECE;
    unsigned int bestPattern=0;
    unsigned int bestTile=0;
 
@@ -173,38 +178,46 @@ int compareTableTile(struct PatternSet * pattSet ,
   unsigned int patternNum=0;
   for ( patternNum=0;    patternNum < pattSet->totalPatterns;    patternNum++ )
   {
-    fprintf(stderr,"Checking for %s\n",pattSet->pattern[patternNum].name);
+    //fprintf(stderr,"Checking for %u tiles of type %s\n",pattSet->pattern[patternNum].totalTiles , pattSet->pattern[patternNum].name);
     for ( tileNum=0;      tileNum < pattSet->pattern[patternNum].totalTiles;     tileNum++ )
    {
        currentScore=10000000;
 
-       compareRGBPatchesIgnoreColor(
-                                     /*Main Image*/
-                                     screen , sX ,  sY , screenWidth, screenHeight ,
-                                     /*Specific Tile*/
-                                     pattSet->pattern[patternNum].tile[tileNum]->pixels , 0,  0 ,
-                                     pattSet->pattern[patternNum].tile[tileNum]->width ,
-                                     pattSet->pattern[patternNum].tile[tileNum]->height,
-                                     /*Ignore R , G , B */
-                                     123,123,0,
-                                     /*Patch Size*/
-                                     width, height ,
-                                     /*Return score*/
-                                     &currentScore ,
-                                     MAXIMUM_ACCEPTED_SCORE
-                                    );
-
-
-
+       if (
+            compareRGBPatchesIgnoreColor(
+                                         /*Main Image*/
+                                         screen , sX ,  sY , screenWidth, screenHeight ,
+                                         /*Specific Tile*/
+                                         pattSet->pattern[patternNum].tile[tileNum]->pixels ,
+                                         0,  0 ,
+                                         pattSet->pattern[patternNum].tile[tileNum]->width ,
+                                         pattSet->pattern[patternNum].tile[tileNum]->height,
+                                         /*Ignore R , G , B */
+                                         123,123,0,
+                                         /*Patch Size*/
+                                         width, height ,
+                                         /*Return score*/
+                                         &currentScore ,
+                                         MAXIMUM_ACCEPTED_SCORE
+                                        )
+           )
+      {
        if (currentScore<bestScore)
        {
          bestScore = currentScore;
          bestPick = pattSet->pattern[patternNum].value;
          bestPattern=patternNum;
          bestTile=tileNum;
+       } else
+       {
+         fprintf(stderr,"CMP : score %u >= best score %u of a %s \n",currentScore,bestScore,getPieceName(bestPick));
        }
+      } else
+      {
+       fprintf(stderr,"Image Comparison failed with an error\n");
+      }
    }
-   if (bestScore < pattSet->pattern[patternNum].acceptScore )
+   if ( (bestPick!=UNKNOWN_PIECE) && (bestScore < pattSet->pattern[patternNum].acceptScore ) )
     {
       fprintf(stderr,"INSTA-Selected %s with a score of %u \n",pattSet->pattern[patternNum].name,bestScore);
       *pick=bestPick;
@@ -212,7 +225,7 @@ int compareTableTile(struct PatternSet * pattSet ,
     }
  }
 
-   if (bestScore < MAXIMUM_ACCEPTED_SCORE )
+   if ( (bestPick!=UNKNOWN_PIECE) &&(bestScore < MAXIMUM_ACCEPTED_SCORE ) )
     {
       fprintf(stderr,"Not so sure , but selected %u with a score of %u \n",bestPick,bestScore);
       *pick=bestPick;
@@ -277,24 +290,27 @@ int seeTable(unsigned int table[8][8] ,
       //Originally unknown piece
       table[x][y]=UNKNOWN_PIECE;
 
+      fprintf(stderr,"%u,%u table has %u,%u coords\n",x,y,clientStartX + x*settings.blockX, clientStartY + y*settings.blockY);
       if
         (
           compareTableTile(&set,
                            screen,screenWidth,screenHeight,
-                           settings.clientX + x*settings.blockX,
-                           settings.clientY + y*settings.blockY,
+                           clientStartX + x*settings.blockX,
+                           clientStartY + y*settings.blockY,
                            settings.blockX ,
-                           settings.blockY , &table[x][y] )
+                           settings.blockY ,
+                           &table[x][y] )
         )
         {
           fprintf(stderr,"Table[%u][%u] got assigned via tiles\n",x,y);
           ++patternAssignments; ++patternAssignmentsTotal;
         }
+        #if USE_SINGLE_PIXEL_FALLBACK
            else
         {
          getRGBPixel(screen,screenWidth,screenHeight,
-                     settings.clientX + settings.offsetX + x*settings.blockX + halfBlockX ,
-                     settings.clientY + settings.offsetY + y*settings.blockY + halfBlockY ,
+                     clientStartX + settings.offsetX + x*settings.blockX + halfBlockX ,
+                     clientStartY + settings.offsetY + y*settings.blockY + halfBlockY ,
                      &R , &G , &B );
          fprintf(stderr,"Pos(%u,%u) = %u , %u , %u \n",x,y,R,G,B);
          if ( closeToRGB(R,G,B, 24, 176 , 44 , settings.threshold)   )      { table[x][y]=GREEN_PIECE; }  else
@@ -306,6 +322,7 @@ int seeTable(unsigned int table[8][8] ,
          if ( closeToRGB(R,G,B, 254, 17, 254,settings.threshold)    )       { table[x][y]=PINK_PIECE; }
          ++singlePixelAssignments; ++singlePixelAssignmentsTotal;
         }
+        #endif
 
 
 
@@ -317,8 +334,8 @@ int seeTable(unsigned int table[8][8] ,
          bitBltRGBToFile(  nameUsed ,
                            0,
                            screen ,
-                           settings.clientX + x*settings.blockX,
-                           settings.clientY + y*settings.blockY,
+                           clientStartX + x*settings.blockX,
+                           clientStartY + y*settings.blockY,
                            screenWidth , screenHeight ,
                            settings.blockX,settings.blockY);
         }
@@ -348,7 +365,8 @@ int seeButtons( unsigned char * screen , unsigned int screenWidth ,unsigned int 
                                      /*Main Image*/
                                      screen , sX ,  sY , screenWidth, screenHeight ,
                                      /*Specific Tile*/
-                                     buttons[buttonNum].buttonsImg->pixels , 0,  0 ,
+                                     buttons[buttonNum].buttonsImg->pixels ,
+                                      0,  0 ,
                                      buttons[buttonNum].buttonsImg->width ,
                                      buttons[buttonNum].buttonsImg->height,
                                      /*Ignore R , G , B */

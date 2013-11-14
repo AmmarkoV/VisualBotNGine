@@ -30,17 +30,17 @@ char * getPieceName(int pieceVal)
 {
   switch (pieceVal)
   {
-    case GREEN_PIECE : return " GREEN_PIECE";   break;
-    case WHITE_PIECE : return " WHITE_PIECE";   break;
-    case ORANGE_PIECE : return " ORANGE_PIECE";   break;
-    case YELLOW_PIECE : return " YELLOW_PIECE";   break;
-    case BLUE_PIECE : return " BLUE_PIECE";   break;
-    case RED_PIECE : return " RED_PIECE";   break;
-    case PINK_PIECE : return " PINK_PIECE";   break;
-    case HYPERCUBE_PIECE : return " HYPERCUBE_PIECE";   break;
-    case EMPTY_PIECE : return " EMPTY_PIECE";   break;
+    case GREEN_PIECE : return "GREEN_PIECE";   break;
+    case WHITE_PIECE : return "WHITE_PIECE";   break;
+    case ORANGE_PIECE : return "ORANGE_PIECE";   break;
+    case YELLOW_PIECE : return "YELLOW_PIECE";   break;
+    case BLUE_PIECE : return "BLUE_PIECE";   break;
+    case RED_PIECE : return "RED_PIECE";   break;
+    case PINK_PIECE : return "PINK_PIECE";   break;
+    case HYPERCUBE_PIECE : return "HYPERCUBE_PIECE";   break;
+    case EMPTY_PIECE : return "EMPTY_PIECE";   break;
     default :
-     return " ?";
+     return "UNKNOWN";
     break;
   }
   return "Nothing ";
