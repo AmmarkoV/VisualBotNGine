@@ -150,10 +150,6 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
 
     //We now have a valid table , lets print it to the console!
     printTable(table);
-     printf("Single Pixel Assignments : %u ( %u ) - Pattern Assignments : %u ( %u )\n",
-                    singlePixelAssignments , singlePixelAssignmentsTotal ,
-                    patternAssignments , patternAssignmentsTotal);
-
 
     if ( isSceneTooAmbiguous(table) )
        {

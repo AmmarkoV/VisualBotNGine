@@ -80,6 +80,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../ImageOperations/patchComparison.h" />
+		<Unit filename="../../ImageOperations/patternSets.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ImageOperations/patternSets.h" />
 		<Unit filename="../MouseMovementDescriptor.h" />
 		<Unit filename="Gweled.h" />
 		<Unit filename="logic.c">
