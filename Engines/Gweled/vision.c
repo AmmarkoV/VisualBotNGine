@@ -58,9 +58,14 @@ struct PatternSet
     struct PatternItem pattern[256];
 };
 
-
 struct PatternSet set;
 
+struct PatternItem scorePlaceholder;
+signed int scorePlaceholderX=195-337,scorePlaceholderY=368-382;
+
+struct PatternSet scoreOCR;
+signed int scoreOCRX=213-337,scoreOCRY=378-382;
+unsigned int scoreOCRSize=15;
 
 int patFileExists(char * filename)
 {
@@ -420,6 +425,24 @@ int initVision()
   addToPatternSet(&set,"Engines/Gweled/Pieces/white",WHITE_PIECE,GOOD_SCORE_BELOW);
   dumpPatternSet(&set,"Initialization");
 // exit(0);
+
+
+  scorePlaceholder=readImage("Engines/Gweled/Menus/score.pnm",PNM_CODEC,0);
+  scoreOCR.totalPatterns=0;
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score0",0,500);
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score1",1,500);
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score2",2,500);
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score3",3,500);
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score4",4,500);
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score5",5,500);
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score6",6,500);
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score7",7,500);
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score8",8,500);
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score9",9,500);
+  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/scoreComma",100,500);
+
+//  195-337 368-382
+
 
   numberOfButtons=0;
   buttons[numberOfButtons].buttonsImg=readImage("Engines/Gweled/Menus/xButton.pnm",PNM_CODEC,0);

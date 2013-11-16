@@ -20,8 +20,8 @@ int allowMouseControl=1;
 int totalNotMoves=0;
 
 //Various delays , confiurable via commandline parameters
-unsigned int clickdelay = 50*1000;
-unsigned int delay = 70*1000;
+unsigned int clickdelay = 40*1000;
+unsigned int delay = 5*1000;
 unsigned int dontknowdelay = 100*1000;
 
 //These are the coordinates that we want the mouse to go at
