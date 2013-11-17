@@ -22,12 +22,31 @@ int doOCR(
 
   unsigned int patternNum , tileNum;
 
+  unsigned int score = 0;
+
+  while(x<width)
+  {
+   score = colorVariance( screen, screenWidth ,screenHeight , x,  y, 2 , height);
+   if ( score < 200 )
+   {
+      x+=2;
+     fprintf(stderr,"Block %u,%u -> %u,%u is empty ( %u ) \n",x,y,2,height,score);
+   } else
+   {
+     fprintf(stderr,"Block %u,%u -> %u,%u is NOT empty ( %u ) \n",x,y,2,height,score);
+     break;
+   }
+  }
+
+
+
+  unsigned int remainingWidth  = width-x;
   while (loops<10)
   {
       if (
            compareToPatternSet(font ,
                                screen , screenWidth , screenHeight ,
-                               x , y , width , height ,
+                               x , y , remainingWidth , height ,
                                OCR_MAX_SCORE,
                                &characterVal,
                                &patternNum,
@@ -39,8 +58,11 @@ int doOCR(
              output[characterNum]=(unsigned char) characterVal;
 
              ++characterNum;
-             fprintf(stderr,"Character %u looks like %u \n",characterNum,characterVal);
-             x+=getPatternSetItemWidth(font,patternNum,tileNum);
+             fprintf(stderr,"Character %u looks like %c \n",characterNum,characterVal);
+             unsigned int xStep = getPatternSetItemWidth(font,patternNum,tileNum);
+             x+=xStep;
+             if (remainingWidth>xStep) { break; } else
+                                       { remainingWidth-=xStep; }
           }
 
     ++loops ;
