@@ -55,6 +55,8 @@ int compareTableTile(struct PatternSet * pattSet ,
      return 0; //We may not want patch comparison
    #endif // NO_PATCH_COMPARISON
 
+  unsigned int patternNum , tileNum;
+
    if ( colorVariance( screen, screenWidth ,screenHeight , sX,  sY, width , height) < 10150 )
    {
        *pick=NO_PIECE;
@@ -66,7 +68,9 @@ int compareTableTile(struct PatternSet * pattSet ,
                              screen , screenWidth , screenHeight ,
                              sX,sY , width ,height ,
                              MAXIMUM_ACCEPTED_SCORE ,
-                             pick)
+                             pick ,
+                             &patternNum ,
+                             &tileNum)
       )
    {
        if ( *pick!= UNKNOWN_PIECE )

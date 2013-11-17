@@ -76,6 +76,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../ImageOperations/imageOps.h" />
+		<Unit filename="../../ImageOperations/ocr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../ImageOperations/ocr.h" />
 		<Unit filename="../../ImageOperations/patchComparison.c">
 			<Option compilerVar="CC" />
 		</Unit>

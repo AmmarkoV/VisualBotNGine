@@ -343,6 +343,27 @@ int bitBltDepthToFile(  char * name  ,char * comment ,
 }
 
 
+
+unsigned int countOccurancesOfRGBPixel(unsigned char * ptrRGB , unsigned int RGBwidth , unsigned int RGBheight , unsigned char transR ,unsigned char transG , unsigned char transB)
+{
+ unsigned int count = 0;
+ unsigned char * sourcePTR =  ptrRGB ;
+ unsigned char * sourceLimitPTR =  ptrRGB + (RGBwidth*RGBheight *3);
+ unsigned char R,G,B;
+
+  while (sourcePTR < sourceLimitPTR)
+  {
+    R = *sourcePTR; ++sourcePTR;
+    G = *sourcePTR; ++sourcePTR;
+    B = *sourcePTR; ++sourcePTR;
+    if ( (R==transR) && (G==transG) && (B==transB) ) { ++count ; }
+  }
+
+ return count ;
+}
+
+
+
 int getRGBPixel(unsigned char * ptrRGB , unsigned int RGBwidth , unsigned int RGBheight ,  unsigned int x , unsigned int y , unsigned char * R , unsigned char * G , unsigned char * B)
 {
  unsigned char * ptr =  ptrRGB  + MEMPLACE3(x,y,RGBwidth);
