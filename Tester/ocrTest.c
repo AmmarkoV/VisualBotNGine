@@ -50,5 +50,8 @@ int main(int argc, char *argv[])
         { printf("OCR String is %s \n",strOutput); } else
         { printf("Could not read an OCR String \n"); }
 
+    destroyImage(img1);
+    emptyPatternSet(&scoreOCR);
+
     return 0;
 }

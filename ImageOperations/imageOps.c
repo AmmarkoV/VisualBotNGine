@@ -146,6 +146,9 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   if ( (width==0)&&(height==0) ) { return 0; }
   if ( (sourceWidth==0)&&(sourceHeight==0) ) { return 0; }
 
+  fprintf(stderr,"BitBlt an area of target image %u,%u  that starts at %u,%u \n",tX,tY,targetWidth,targetHeight);
+  fprintf(stderr,"BitBlt an area of source image %u,%u  that starts at %u,%u \n",sX,sY,sourceWidth,sourceHeight);
+  fprintf(stderr,"BitBlt size was width %u height %u \n",width,height);
   //Check for bounds -----------------------------------------
   if (tX+width>=targetWidth) { width=targetWidth-tX;  }
   if (tY+height>=targetHeight) { height=targetHeight-tY;  }
@@ -153,6 +156,7 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   if (sX+width>=sourceWidth) { width=sourceWidth-sX;  }
   if (sY+height>=sourceHeight) { height=sourceHeight-sY;  }
   //----------------------------------------------------------
+  fprintf(stderr,"BitBlt size NOW is width %u height %u \n",width,height);
 
 
   unsigned char * sourcePTR; unsigned char * sourceLineLimitPTR; unsigned char * sourceLimitPTR; unsigned int sourceLineSkip;
