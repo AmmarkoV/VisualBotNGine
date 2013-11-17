@@ -1,7 +1,7 @@
 #include "ocr.h"
 #include <stdio.h>
 
-#define OCR_MAX_SCORE 60000
+#define OCR_MAX_SCORE 40000
 
 int doOCR(
            unsigned char * screen , unsigned int screenWidth , unsigned int screenHeight ,
@@ -27,7 +27,7 @@ int doOCR(
   while(x<width)
   {
    score = colorVariance( screen, screenWidth ,screenHeight , x,  y, 2 , height);
-   if ( score < 200 )
+   if ( score < 800 )
    {
       x+=2;
      fprintf(stderr,"Block %u,%u -> %u,%u is empty ( %u ) \n",x,y,2,height,score);
@@ -38,7 +38,9 @@ int doOCR(
    }
   }
 
-
+  //if (x>=2) { x-=2; }
+  ++x;
+  fprintf(stderr,"Starting at  X = %u \n",x);
 
   unsigned int remainingWidth  = width-x;
   while (loops<10)
@@ -61,7 +63,7 @@ int doOCR(
              fprintf(stderr,"Character %u looks like %c \n",characterNum,characterVal);
              unsigned int xStep = getPatternSetItemWidth(font,patternNum,tileNum);
              x+=xStep;
-             if (remainingWidth>xStep) { break; } else
+             if (remainingWidth<xStep) { break; } else
                                        { remainingWidth-=xStep; }
           }
 

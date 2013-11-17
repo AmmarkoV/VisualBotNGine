@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
     addToPatternSet(&scoreOCR,"../Engines/Gweled/OCR/score8_",0+'8',500);
     addToPatternSet(&scoreOCR,"../Engines/Gweled/OCR/score9_",0+'9',500);
     addToPatternSet(&scoreOCR,"../Engines/Gweled/OCR/scoreComma_",0+',',500);
+    addToPatternSet(&scoreOCR,"../Engines/Gweled/OCR/scoreSpace_",0+' ',500);
 
 
 
@@ -39,15 +40,15 @@ int main(int argc, char *argv[])
    if (
         doOCR(
               img1->pixels, img1->width , img1->height ,
-              13 , 0  , img1->width-13 , img1->height  ,
+              0 , 0  , img1->width , img1->height  ,
               &scoreOCR ,
 
               strOutput ,
               MAX_OCR_STRING
              )
        )
-        { fprintf(stderr,"OCR String is %s \n",strOutput); } else
-        { fprintf(stderr,"Could not read an OCR String \n"); }
+        { printf("OCR String is %s \n",strOutput); } else
+        { printf("Could not read an OCR String \n"); }
 
     return 0;
 }
