@@ -11,6 +11,11 @@
 #include "../../ImageOperations/imageOps.h"
 #include "../../Codecs/codecs.h"
 
+
+#include "../../ImageOperations/ocr.h"
+
+#define MAX_OCR_STRING 512
+
 #define GOOD_SCORE_BELOW 500
 #define MAXIMUM_ACCEPTED_SCORE 70000
 #define MAXIMUM_ACCEPTED_SCORE_FOR_BUTTONS 90000
@@ -196,7 +201,24 @@ int seeButtons( unsigned char * screen , unsigned int screenWidth ,unsigned int 
 
 
 
-
+int seeScore( unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
+              unsigned int x,unsigned int y , unsigned int width , unsigned int height ,
+              char * strOutput , unsigned int strOutputMaxLength
+            )
+{
+   if (
+        doOCR(
+              screen, screenWidth,screenHeight,
+              x , y  , width , height  ,
+              &scoreOCR ,
+              strOutput ,
+              strOutputMaxLength
+             )
+       )
+        { printf("OCR String is %s \n",strOutput);  return 1; } else
+        { printf("Could not read an OCR String \n"); }
+   return 0;
+}
 
 
 
@@ -218,18 +240,19 @@ int initVision()
 
 
 //  scorePlaceholder=readImage("Engines/Gweled/Menus/score.pnm",PNM_CODEC,0);
-  scoreOCR.totalPatterns=0;
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score0",0,500);
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score1",1,500);
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score2",2,500);
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score3",3,500);
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score4",4,500);
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score5",5,500);
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score6",6,500);
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score7",7,500);
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score8",8,500);
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score9",9,500);
-  addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/scoreComma",100,500);
+    scoreOCR.totalPatterns=0;
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score0_",0+'0',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score1_",0+'1',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score2_",0+'2',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score3_",0+'3',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score4_",0+'4',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score5_",0+'5',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score6_",0+'6',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score7_",0+'7',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score8_",0+'8',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/score9_",0+'9',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/scoreComma_",0+',',500);
+    addToPatternSet(&scoreOCR,"Engines/Gweled/OCR/scoreSpace_",0+' ',500);
 
 //  195-337 368-382
 
@@ -285,4 +308,5 @@ int initVision()
 int stopVision()
 {
   emptyPatternSet(&set);
+  emptyPatternSet(&scoreOCR);
 }

@@ -151,6 +151,22 @@ int thinkWhatToPlay(unsigned char * screen , unsigned int screenWidth ,unsigned 
     //We now have a valid table , lets print it to the console!
     printTable(table);
 
+
+    /* NOT TESTED YET
+    char scoreBoard[256];
+    signed int scoreOCRX=213-337,scoreOCRY=378-382;
+    if (
+         seeScore( screen , screenWidth ,screenHeight ,
+                   clientStartX+scoreOCRX,clientStartY+scoreOCRY , 80 , scoreOCRSize,
+                   scoreBoard , 256 )
+       )
+       {
+         fprintf(stderr,"Our Score is %s\n",scoreBoard);
+       }
+     */
+
+
+
     if ( isSceneTooAmbiguous(table) )
        {
          ourPlan->totalMovements=0;
