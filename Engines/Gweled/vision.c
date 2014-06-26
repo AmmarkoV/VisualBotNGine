@@ -148,6 +148,8 @@ int seeTable(unsigned int table[8][8] ,
 
      }
     }
+
+  return 1;
 }
 
 
@@ -309,4 +311,5 @@ int stopVision()
 {
   emptyPatternSet(&set);
   emptyPatternSet(&scoreOCR);
+  return 1;
 }

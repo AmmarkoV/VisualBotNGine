@@ -94,7 +94,7 @@ unsigned int compareDepthPatches( unsigned short * patchADepth , unsigned int pA
 int compareRGBPatches( unsigned char * patchARGB , unsigned int pACX,  unsigned int pACY , unsigned int pAImageWidth , unsigned int pAImageHeight ,
                        unsigned char * patchBRGB , unsigned int pBCX,  unsigned int pBCY , unsigned int pBImageWidth , unsigned int pBImageHeight ,
                        unsigned int patchWidth, unsigned int patchHeight  ,
-                       unsigned int * score
+                       unsigned int * score , unsigned int maxScore
                      )
 {
   if ( (patchARGB==0)||(patchBRGB==0) ) { return 0; }
@@ -148,6 +148,8 @@ int compareRGBPatches( unsigned char * patchARGB , unsigned int pACX,  unsigned 
     pA_LineLimitPTR+= pAImageWidth*3;
     pA_PTR+=pA_LineSkip;
     pB_PTR+=pB_LineSkip;
+
+    if ( (maxScore!=0) && (maxScore<=score) ) {  fprintf(stderr,"Fast Result = %u \n",*score); return 1; }
   }
 
   fprintf(stderr,"Result = %u \n",*score);

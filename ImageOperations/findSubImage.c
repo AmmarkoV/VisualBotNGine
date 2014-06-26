@@ -7,7 +7,8 @@ int RGBfindImageInImage(
                         unsigned char * haystack , unsigned int haystackWidth , unsigned int haystackHeight ,
                         unsigned char * needle   , unsigned int needleWidth   , unsigned int needleHeight   ,
                         unsigned int * resX ,
-                        unsigned int * resY
+                        unsigned int * resY ,
+                        unsigned int maxScore
                        )
 {
   unsigned int bestScore=10000000 , bestX=0 , bestY=0;
@@ -21,7 +22,7 @@ int RGBfindImageInImage(
              compareRGBPatches( haystack , x ,  y , haystackWidth ,  haystackHeight,
                                 needle   , 0 ,  0 , needleWidth   ,  needleHeight ,
                                 needleWidth   ,  needleHeight
-                                , &score)
+                                , &score , maxScore  )
            )
            {
               if ( score < bestScore) { bestScore = score;  bestX=x;  bestY = y;  }

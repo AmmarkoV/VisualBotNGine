@@ -12,7 +12,7 @@ unsigned int compareDepthPatches( unsigned short * patchADepth , unsigned int pA
 int compareRGBPatches( unsigned char * patchARGB , unsigned int pACX,  unsigned int pACY , unsigned int pAImageWidth , unsigned int pAImageHeight ,
                                 unsigned char * patchBRGB , unsigned int pBCX,  unsigned int pBCY , unsigned int pBImageWidth , unsigned int pBImageHeight ,
                                 unsigned int patchWidth, unsigned int patchHeight  ,
-                                unsigned int * score
+                                unsigned int * score, unsigned int maxScore
                               );
 
 int compareRGBPatchesIgnoreColor

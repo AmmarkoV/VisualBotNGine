@@ -220,8 +220,8 @@ int initializeEngine(char * settingsStr)
       //sissy foss : 619 354 ,
       //Jazz : 620 468
 
-      settings.clientX = 337;
-      settings.clientY = 382;
+      settings.clientX = 333;
+      settings.clientY = 399;
       settings.blockX = 40;
       settings.blockY = 40;
       settings.offsetX = 0;

@@ -12,6 +12,7 @@
 #include "xwd-1.0.5/XwdLib.h"
 
 #define XWDLIB_BRIDGE 1
+#define AUTO_LOCALIZE 0
 
 #define SECOND_USLEEP 1000*1000
 
@@ -32,7 +33,9 @@ signed int mouseNeutralY = -50;
 
 //sissy foss : 619 354 ,
 //Jazz : 620 468
-unsigned int resX = 337 , resY = 382;
+//Ammar Ubuntu 13.10
+//unsigned int resX = 337 , resY = 382;
+unsigned int resX = 332 , resY = 387;
 
 
 void countdownDelay(int seconds)
@@ -154,21 +157,23 @@ int main(int argc, char *argv[])
     fprintf(stderr,"Starting Up\n");
 
     struct Image * haystack = reloadScreen(0);
-    struct Image * needle = readImage("seek.pnm",PNM_CODEC,0);
+    struct Image * needle = readImage("Engines/Gweled/Menus/boardStartSmall.pnm",PNM_CODEC,0);
 
-    /*
+    #if AUTO_LOCALIZE
     if (
          RGBfindImageInImage(
                              haystack->pixels , haystack->width , haystack->height ,
                              needle->pixels   , needle->width   , needle->height   ,
                              &resX ,
-                             &resY
+                             &resY ,
+                             10000
                             )
        )
     {
         fprintf(stderr,"Found Image in Image @ %u,%u \n",resX,resY);
-        resY+= needle->height
-    }*/
+        resY+= needle->height;
+    }
+    #endif // AUTO_LOCALIZE
 
     unsigned int iterations=0;
     unsigned int fromX , fromY , toX , toY;
