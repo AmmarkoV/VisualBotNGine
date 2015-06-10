@@ -35,7 +35,11 @@ signed int mouseNeutralY = -50;
 //Jazz : 620 468
 //Ammar Ubuntu 13.10
 //unsigned int resX = 337 , resY = 382;
-unsigned int resX = 332 , resY = 387;
+//unsigned int resX = 337 , resY = 383-1;
+
+//51 326 arxi tou flash player
+unsigned int oX = 56 , oY = 326;
+unsigned int resX=0 , resY =0; //This will get initialized in main
 
 
 void countdownDelay(int seconds)
@@ -186,6 +190,7 @@ int main(int argc, char *argv[])
     }
 
 
+    resX = oX+175 , resY = oY+109;
     while (1)
     {
       fprintf(stderr,"Round %u \n",iterations);
