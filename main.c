@@ -13,6 +13,7 @@
 
 #define XWDLIB_BRIDGE 1
 #define AUTO_LOCALIZE 0
+#define NEW_AUTO_LOCALIZE 0
 
 #define SECOND_USLEEP 1000*1000
 
@@ -161,16 +162,34 @@ int main(int argc, char *argv[])
     fprintf(stderr,"Starting Up\n");
 
     struct Image * haystack = reloadScreen(0);
-    struct Image * needle = readImage("Engines/Gweled/Menus/boardStartSmall.pnm",PNM_CODEC,0);
 
+    #if NEW_AUTO_LOCALIZE
+    oX=0; oY=0;
+    struct Image * needle = readImage("Engines/Gweled/Menus/startOfClient.pnm",PNM_CODEC,0);
+     if (
+         RGBfindImageInImage(
+                             haystack->pixels , haystack->width , haystack->height ,
+                             needle->pixels   , needle->width   , needle->height   ,
+                             &oX ,
+                             &oY ,
+                             50,
+                             200
+                            )
+       )
+    {
+        fprintf(stderr,"Found Image in Image @ %u,%u \n",oX,oY);
+        exit(0);
+    }
+    #endif // NEW_AUTO_LOCALIZE
     #if AUTO_LOCALIZE
+    struct Image * needle = readImage("Engines/Gweled/Menus/boardStartSmall.pnm",PNM_CODEC,0);
     if (
          RGBfindImageInImage(
                              haystack->pixels , haystack->width , haystack->height ,
                              needle->pixels   , needle->width   , needle->height   ,
                              &resX ,
                              &resY ,
-                             10000
+                             1000
                             )
        )
     {
