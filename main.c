@@ -180,6 +180,8 @@ int main(int argc, char *argv[])
         fprintf(stderr,"Found Image in Image @ %u,%u \n",oX,oY);
         exit(0);
     }
+
+    destroyImage(needle);
     #endif // NEW_AUTO_LOCALIZE
     #if AUTO_LOCALIZE
     struct Image * needle = readImage("Engines/Gweled/Menus/boardStartSmall.pnm",PNM_CODEC,0);
@@ -196,6 +198,8 @@ int main(int argc, char *argv[])
         fprintf(stderr,"Found Image in Image @ %u,%u \n",resX,resY);
         resY+= needle->height;
     }
+
+    destroyImage(needle);
     #endif // AUTO_LOCALIZE
 
     unsigned int iterations=0;
@@ -236,7 +240,6 @@ int main(int argc, char *argv[])
       haystack = reloadScreen(haystack);
     }
 
-    destroyImage(needle);
     destroyImage(haystack);
 
     stopEngine();
