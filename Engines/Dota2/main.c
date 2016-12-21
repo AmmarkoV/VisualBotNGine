@@ -145,7 +145,8 @@ struct Image * reloadScreen(struct Image * lastImg)
 
 int main(int argc, char *argv[])
 {
-  updateHeroStats();
+  struct allHeroes heroes;
+  updateHeroStats(&heroes);
 
   int i=0;
   for (i=0; i<argc; i++)

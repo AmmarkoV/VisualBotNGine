@@ -1,7 +1,7 @@
 #ifndef HEROES_H_INCLUDED
 #define HEROES_H_INCLUDED
 
-#define HERO_NUMBER 244
+#define HERO_NUMBER 113
 
 struct hero
 {
@@ -14,7 +14,7 @@ struct hero
 
 struct allHeroes
 {
-  struct hero[HERO_NUMBER]
+  struct hero heroList[HERO_NUMBER];
 };
 
 #endif // HEROES_H_INCLUDED

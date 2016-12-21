@@ -81,6 +81,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../ImageOperations/patternSets.h" />
+		<Unit filename="../../InputParser/InputParser_C.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../InputParser/InputParser_C.h" />
 		<Unit filename="../MouseMovementDescriptor.h" />
 		<Unit filename="heroes.c">
 			<Option compilerVar="CC" />
@@ -89,6 +93,10 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="pick.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pick.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
