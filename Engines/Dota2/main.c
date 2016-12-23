@@ -146,6 +146,7 @@ struct Image * reloadScreen(struct Image * lastImg)
 int main(int argc, char *argv[])
 {
   struct allHeroes heroes;
+  struct teams currentSelections;
   updateHeroStats(&heroes);
 
   int i=0;
@@ -175,7 +176,7 @@ int main(int argc, char *argv[])
     struct mouseMovements ourPlan;
 
 
-
+    initializeSeeingPicks();
     resX = oX+175 , resY = oY+109;
     while (1)
     {
@@ -184,6 +185,9 @@ int main(int argc, char *argv[])
 
       usleep(delay);
       haystack = reloadScreen(haystack);
+
+      seePicks(&currentSelections,haystack);
+
     }
 
     destroyImage(haystack);

@@ -63,7 +63,7 @@ int printHeroStats(struct allHeroes * hl)
  unsigned int i=0;
  for (i=0; i<HERO_NUMBER; i++)
     {
-       fprintf(stderr,"#%u - %s - %0.2f - %0.2f - %0.2f \n",
+       fprintf(stderr,"#%u - `%s` - %0.2f - %0.2f - %0.2f \n",
                i,
                hl->heroList[i].name,
                hl->heroList[i].globalWinRate,
@@ -82,34 +82,47 @@ int updateHeroStats( struct allHeroes * hl)
   char * raw = astringReadFileToMemory("online/winclean3", &length );
   char nameA[256];
   char nameB[256];
+  char nameC[256];
+  char nameD[256];
 
-  struct InputParserC * ipc = InputParser_Create(1024,1);
+  struct InputParserC * ipc = InputParser_Create(1024,2);
   InputParser_SetDelimeter(ipc,0,' ');
+  InputParser_SetDelimeter(ipc,1,' ');
 
-   InputParser_SeperateWords(ipc,raw,0);
+  fprintf(stderr,"Splitting input , delimiters `%c` `%c` \n" , InputParser_GetDelimeter(ipc,0) , InputParser_GetDelimeter(ipc,1) );
+  InputParser_SeperateWords(ipc,raw,0);
 
     unsigned int heroNum=0;
     unsigned int i=0,c=0;
     while (i<1000)
     {
-     fprintf(stderr,"hero %u , place %u \n" , heroNum , i);
-     InputParser_GetWord(ipc,i,nameA,256);
-     c=i+1;
-     InputParser_GetWord(ipc,c,nameB,256);
-     if (InputParser_GetWordFloat(ipc,c)==0)
-        {
-         snprintf(hl->heroList[heroNum].name,128,"%s %s",nameA,nameB);
-         ++c;
-        } else
-        {
-          snprintf(hl->heroList[heroNum].name,128,"%s",nameA);
-        }
-      hl->heroList[heroNum].globalWinRate  = InputParser_GetWordFloat(ipc,c+1);
-      hl->heroList[heroNum].globalPickRate = InputParser_GetWordFloat(ipc,c+2);
-      hl->heroList[heroNum].KDA      = InputParser_GetWordFloat(ipc,c+3);
+     //fprintf(stderr,"hero %u , place %u \n" , heroNum , i);
+     InputParser_GetWord(ipc,i+0,nameA,256); //fprintf(stderr,"nameA=%s (%0.2f)"   , nameA, atof(nameA));
+     InputParser_GetWord(ipc,i+1,nameB,256); //fprintf(stderr,"nameB=%s (%0.2f)"   , nameB, atof(nameB));
+     InputParser_GetWord(ipc,i+2,nameC,256); //fprintf(stderr,"nameC=%s (%0.2f)"   , nameC , atof(nameC));
+     InputParser_GetWord(ipc,i+3,nameD,256); //fprintf(stderr,"nameD=%s (%0.2f) \n " , nameD , atof(nameD));
+
+
+     if (atof(nameD)==0) { i=i+3; snprintf(hl->heroList[heroNum].name,128,"%s %s %s %s",nameA,nameB,nameC,nameD); } else
+     if (atof(nameC)==0) { i=i+2; snprintf(hl->heroList[heroNum].name,128,"%s %s %s",nameA,nameB,nameC); }          else
+     if (atof(nameB)==0) { i=i+1; snprintf(hl->heroList[heroNum].name,128,"%s %s",nameA,nameB); }                   else
+                         { snprintf(hl->heroList[heroNum].name,128,"%s",nameA); }
+
+
+
+      char val[256];
+
+      InputParser_GetWord(ipc,i+1,val,256);
+      hl->heroList[heroNum].globalWinRate  = atof(val); // InputParser_GetWordFloat(ipc,i+1);
+
+      InputParser_GetWord(ipc,i+2,val,256);
+      hl->heroList[heroNum].globalPickRate = atof(val); // InputParser_GetWordFloat(ipc,i+2);
+
+      InputParser_GetWord(ipc,i+3,val,256);
+      hl->heroList[heroNum].KDA            = atof(val); // InputParser_GetWordFloat(ipc,i+3);
+      i+=4;
+
       ++heroNum;
-      c+=3;
-      i=c;
       if (HERO_NUMBER<=heroNum) { break; }
     }
 
