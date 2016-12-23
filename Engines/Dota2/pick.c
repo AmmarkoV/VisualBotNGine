@@ -98,7 +98,6 @@ int isPickEmpty(unsigned int pid , struct pickScreen * picks , struct Image * vi
   fprintf(stderr,"pick%u empty score %u :  ",pid,currentScore);
   if (currentScore<190000) { fprintf(stderr,"EMPTY\n"); return 1;}
 
-  fprintf(stderr,"PICKED\n");
   return 0;
 }
 
@@ -136,8 +135,6 @@ int seePicks(struct teams * team ,struct Image * view)
 
     if (!isPickEmpty(i, &picks , view) )
      {
-
-
        if
         ( compareTableTile(&selectionSet,
                            view->pixels , view->width , view->height,
