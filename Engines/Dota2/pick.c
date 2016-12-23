@@ -9,7 +9,7 @@
 #include "../../Codecs/codecs.h"
 
 
-#define MAXIMUM_ACCEPTED_SCORE 70000
+#define MAXIMUM_ACCEPTED_SCORE 200000
 
 // 96x67
 // RADIANT 175 299 423 547 672 DIRE 1156 1276 1400 1524 1648
@@ -148,7 +148,8 @@ int seePicks(struct teams * team ,struct Image * view)
     if (!isPickEmpty(i, &picks , view) )
      {
        if
-        ( compareTableTile(&selectionSet,
+        (
+          compareTableTile(&selectionSet,
                            view->pixels , view->width , view->height,
                            0 + picks.avatarX[i],
                            0 + picks.avatarY[i],
@@ -162,7 +163,8 @@ int seePicks(struct teams * team ,struct Image * view)
         }
         else
        if
-        ( compareTableTile(&pickedSet,
+        (
+          compareTableTile(&pickedSet,
                            view->pixels , view->width , view->height,
                            0 + picks.avatarX[i],
                            0 + picks.avatarY[i],

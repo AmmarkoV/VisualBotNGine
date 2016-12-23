@@ -279,9 +279,9 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   if ( (width==0)&&(height==0) ) { return 0; }
   if ( (sourceWidth==0)&&(sourceHeight==0) ) { return 0; }
 
-  fprintf(stderr,"BitBlt an area of target image %u,%u  sized %u,%u \n",tX,tY,targetWidth,targetHeight);
-  fprintf(stderr,"BitBlt an area of source image %u,%u  sized %u,%u \n",sX,sY,sourceWidth,sourceHeight);
-  fprintf(stderr,"BitBlt size was width %u height %u \n",width,height);
+  //fprintf(stderr,"BitBlt an area of target image %u,%u  sized %u,%u \n",tX,tY,targetWidth,targetHeight);
+  //fprintf(stderr,"BitBlt an area of source image %u,%u  sized %u,%u \n",sX,sY,sourceWidth,sourceHeight);
+  //fprintf(stderr,"BitBlt size was width %u height %u \n",width,height);
   //Check for bounds -----------------------------------------
   if (tX+width>=targetWidth) { width=targetWidth-tX-1;  }
   if (tY+height>=targetHeight) { height=targetHeight-tY-1;  }
@@ -289,7 +289,7 @@ int bitbltRGB(unsigned char * target,  unsigned int tX,  unsigned int tY , unsig
   if (sX+width>=sourceWidth) { width=sourceWidth-sX-1;  }
   if (sY+height>=sourceHeight) { height=sourceHeight-sY-1;  }
   //----------------------------------------------------------
-  fprintf(stderr,"BitBlt size NOW is width %u height %u \n",width,height);
+  //fprintf(stderr,"BitBlt size NOW is width %u height %u \n",width,height);
 
   unsigned char *  sourcePTR      = source+ MEMPLACE3(sX,sY,sourceWidth);
   unsigned char *  sourceLimitPTR = source+ MEMPLACE3((sX+width),(sY+height),sourceWidth);
@@ -580,7 +580,7 @@ int getRGBPixel(unsigned char * ptrRGB , unsigned int RGBwidth , unsigned int RG
 
 unsigned short getDepthPixel(unsigned short * ptrDepth , unsigned int Depthwidth , unsigned int Depthheight ,  unsigned int x , unsigned int y)
 {
- unsigned short * ptr =  ptrDepth  + MEMPLACE1(x,y,Depthwidth); 
+ unsigned short * ptr =  ptrDepth  + MEMPLACE1(x,y,Depthwidth);
  return *ptr;
 }
 
