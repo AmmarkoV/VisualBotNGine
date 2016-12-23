@@ -18,6 +18,7 @@ int totalSeeTimes=0;
 
 
 struct PatternSet selectionSet={0};
+struct PatternSet pickedSet={0};
 struct Image * emptyPick=0;
 
 
@@ -30,8 +31,18 @@ int initializeSeeingPicks()
  for (i=0; i<d2_number_of_heroes; i++)
   {
    snprintf(heroPath,128,"tiles/%s_s.pnm",dota2InternalHeroNames[i]);
-   addToPatternSet(&selectionSet,heroPath,i,30000);
+   addToPatternSet(&selectionSet,heroPath,i,MAXIMUM_ACCEPTED_SCORE);
   }
+
+
+ for (i=0; i<d2_number_of_heroes; i++)
+  {
+   snprintf(heroPath,128,"tiles/%s_p.pnm",dota2InternalHeroNames[i]);
+   addToPatternSet(&pickedSet,heroPath,i,MAXIMUM_ACCEPTED_SCORE);
+  }
+
+
+
  return 1;
 }
 
@@ -49,12 +60,13 @@ int compareTableTile(struct PatternSet * pattSet ,
 
   unsigned int patternNum , tileNum;
 
+/*
    if ( colorVariance( screen, screenWidth ,screenHeight , sX,  sY, width , height) < 10150 )
    {
        *pick=0;
        return 1;
    }
-
+*/
    if (
         compareToPatternSet( pattSet ,
                              screen , screenWidth , screenHeight ,
@@ -145,11 +157,27 @@ int seePicks(struct teams * team ,struct Image * view)
                            &team->playersHeroes[i])
         )
         {
-          fprintf(stderr,"Pick [%u] got assigned via tiles\n",i);
+          fprintf(stderr,"Selected[%u] got assigned via tiles\n",i);
+          team->playersPicked[i]=1;
+        }
+        else
+       if
+        ( compareTableTile(&pickedSet,
+                           view->pixels , view->width , view->height,
+                           0 + picks.avatarX[i],
+                           0 + picks.avatarY[i],
+                           picks.avatarWidth,
+                           picks.avatarHeight,
+                           &team->playersHeroes[i])
+        )
+        {
+          fprintf(stderr,"Picked[%u] got assigned via tiles\n",i);
+          team->playersPicked[i]=2;
         }
         else
         {
          //store unknown thing..!
+         fprintf(stderr,"Unknown thing @ %u \n",i);
          snprintf(img,256,"avatars/av_%u_%u",i,totalSeeTimes);
          bitBltRGBToFile( img,
                     0,
