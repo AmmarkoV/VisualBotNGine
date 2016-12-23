@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "pick.h"
+#include "heroes.h"
 
 #include "../../ImageOperations/patternSets.h"
 #include "../../ImageOperations/ocr.h"
@@ -8,6 +9,7 @@
 #include "../../Codecs/codecs.h"
 
 
+#define MAXIMUM_ACCEPTED_SCORE 70000
 
 // 96x67
 // RADIANT 175 299 423 547 672 DIRE 1156 1276 1400 1524 1648
@@ -15,78 +17,62 @@
 int totalSeeTimes=0;
 
 
-struct PatternSet set;
+struct PatternSet selectionSet={0};
 struct Image * emptyPick=0;
 
-/*
-int seeTable(unsigned int table[8][8] ,
-             unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
-             unsigned int clientStartX , unsigned int clientStartY)
-{
-    ++seeFunctionCalls;
 
-    char dumpMsg[512];
-    sprintf(dumpMsg,"see%u",seeFunctionCalls);
-    dumpPatternSet(&set,dumpMsg);
-
-
-
-    unsigned int halfBlockX = (unsigned int) settings.blockX/2;
-    unsigned int halfBlockY = (unsigned int) settings.blockY/2;
-
-    unsigned char R,G,B;
-    unsigned int x,y;
-    for (y=0; y<8; y++)
-    {
-     for (x=0; x<8; x++)
-     {
-      //Originally unknown piece
-      table[x][y]=UNKNOWN_PIECE;
-
-      fprintf(stderr,"%u,%u table has %u,%u coords\n",x,y,clientStartX + x*settings.blockX, clientStartY + y*settings.blockY);
-      if
-        (
-          compareTableTile(&set,
-                           screen,screenWidth,screenHeight,
-                           clientStartX + x*settings.blockX,
-                           clientStartY + y*settings.blockY,
-                           settings.blockX ,
-                           settings.blockY ,
-                           &table[x][y] )
-        )
-        {
-          fprintf(stderr,"Table[%u][%u] got assigned via tiles\n",x,y);
-        }
-
-
-
-        #if DUMP_UNKNOWN_PATCHES
-        if (table[x][y]==UNKNOWN_PIECE)
-        {
-         char nameUsed[512]={0};
-         sprintf(nameUsed,"Dump/tile%u_%u_%u",seeFunctionCalls,x,y);
-         bitBltRGBToFile(  nameUsed ,
-                           0,
-                           screen ,
-                           clientStartX + x*settings.blockX,
-                           clientStartY + y*settings.blockY,
-                           screenWidth , screenHeight ,
-                           settings.blockX,settings.blockY);
-        }
-        #endif // DUMP_PATCHES
-
-
-     }
-    }
-
-  return 1;
-}
-*/
 int initializeSeeingPicks()
 {
  emptyPick = readImage( "tiles/empty.pnm",PNM_CODEC, 0 );
+
+ char heroPath[128];
+ unsigned int i=0;
+ for (i=0; i<d2_number_of_heroes; i++)
+  {
+   snprintf(heroPath,128,"tiles/%s_s.pnm",dota2InternalHeroNames[i]);
+   addToPatternSet(&selectionSet,heroPath,i,30000);
+  }
+ return 1;
 }
 
+
+
+
+int compareTableTile(struct PatternSet * pattSet ,
+                     unsigned char * screen , unsigned int screenWidth ,unsigned int screenHeight ,
+                     unsigned int sX,unsigned int sY , unsigned int width ,unsigned int height ,
+                     unsigned int * pick)
+{
+   #if NO_PATCH_COMPARISON
+     return 0; //We may not want patch comparison
+   #endif // NO_PATCH_COMPARISON
+
+  unsigned int patternNum , tileNum;
+
+   if ( colorVariance( screen, screenWidth ,screenHeight , sX,  sY, width , height) < 10150 )
+   {
+       *pick=0;
+       return 1;
+   }
+
+   if (
+        compareToPatternSet( pattSet ,
+                             screen , screenWidth , screenHeight ,
+                             sX,sY , width ,height ,
+                             MAXIMUM_ACCEPTED_SCORE ,
+                             pick ,
+                             &patternNum ,
+                             &tileNum)
+      )
+   {
+       if ( *pick!= d2_unknown )
+       {
+           return 1;
+       }
+   }
+
+ return 0;
+}
 
 int isPickEmpty(unsigned int pid , struct pickScreen * picks , struct Image * view)
 {
@@ -152,20 +138,42 @@ int seePicks(struct teams * team ,struct Image * view)
      {
 
 
-   snprintf(img,256,"avatars/av_%u_%u",i,totalSeeTimes);
-   bitBltRGBToFile( img,
+       if
+        ( compareTableTile(&selectionSet,
+                           view->pixels , view->width , view->height,
+                           0 + picks.avatarX[i],
+                           0 + picks.avatarY[i],
+                           picks.avatarWidth,
+                           picks.avatarHeight,
+                           &team->playersHeroes[i])
+        )
+        {
+          fprintf(stderr,"Pick [%u] got assigned via tiles\n",i);
+        }
+        else
+        {
+         //store unknown thing..!
+         snprintf(img,256,"avatars/av_%u_%u",i,totalSeeTimes);
+         bitBltRGBToFile( img,
                     0,
                     view->pixels ,
                     0 + picks.avatarX[i],
                     0 + picks.avatarY[i],
                     view->width, view->height,
                     picks.avatarWidth+1,picks.avatarHeight+1);
+        }
 
 
+
+     } else
+     {
+        team->playersHeroes[i]=0;
+        team->playersPicked[i]=0;
      }
 
   }
 
 
   ++totalSeeTimes;
+ return 1;
 }
