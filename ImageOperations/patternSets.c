@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "patternSets.h"
 #include "../Codecs/codecs.h"
 
@@ -111,7 +112,7 @@ unsigned int getPatternSetItemWidth(struct PatternSet * pattSet  , unsigned int 
     {
       return pattSet->pattern[patternNum].tile[tileNum]->width;
     }
- fprintf(stderr,"getPatternSetItemWidth asking for out of bounds pattern ( number %u / %u ) ",patternNum,pattSet->totalPatterns);
+ fprintf(stderr,"getPatternSetItemWidth asking for out of bounds pattern ( number %u / %u )\n",patternNum,pattSet->totalPatterns);
  return 0;
 }
 
@@ -125,20 +126,32 @@ int compareToPatternSet(struct PatternSet * pattSet ,
                         unsigned int * resultTileNum
                         )
 {
-   unsigned int currentScore=maximumAcceptedScore+1;
-   unsigned int bestScore=maximumAcceptedScore+1;
-   unsigned int bestPick=0;
-   unsigned int bestPattern=0;
-   unsigned int bestTile=0;
+  fprintf(stderr,"compareToPatternSet(screen,%u,%u,",screenWidth,screenHeight);
+  fprintf(stderr,"sX=%u,sY=%u,width=%u,height=%u,",sX,sY,width,height);
+  fprintf(stderr,"maxScore=%u)\n",maximumAcceptedScore);
+
+  unsigned int currentScore=maximumAcceptedScore+1;
+  unsigned int bestScore=maximumAcceptedScore+1;
+  unsigned int bestPick=0;
+  unsigned int bestPattern=0;
+  unsigned int bestTile=0;
 
   unsigned int tileNum=0;
   unsigned int patternNum=0;
+
+  fprintf(stderr,"Will work on a pattern set with %u Patterns\n",pattSet->totalPatterns);
   for ( patternNum=0;    patternNum < pattSet->totalPatterns;    patternNum++ )
   {
-   for ( tileNum=0;      tileNum < pattSet->pattern[patternNum].totalTiles;     tileNum++ )
+
+
+   if (pattSet->pattern[patternNum].totalTiles>0)
    {
+    fprintf(stderr," Pattern set %u has %u tiles\n",patternNum,pattSet->pattern[patternNum].totalTiles);
+    for ( tileNum=0;      tileNum < pattSet->pattern[patternNum].totalTiles;     tileNum++ )
+    {
        currentScore=maximumAcceptedScore+1;
 
+       fprintf(stderr," pattern %u / tile %u \n",patternNum,tileNum);
        if (
             compareRGBPatchesIgnoreColor(
                                          /*Main Image*/
@@ -170,7 +183,8 @@ int compareToPatternSet(struct PatternSet * pattSet ,
          bestTile=tileNum;
        }
       }
-   }
+     }
+    }
 
    //Done checking with a family of the pattern set
    if (bestScore < pattSet->pattern[patternNum].acceptScore )
@@ -185,9 +199,6 @@ int compareToPatternSet(struct PatternSet * pattSet ,
 
    if (bestScore < maximumAcceptedScore )
     {
-
-
-
          unsigned int x=0,y=0;
          char comment[512]={0};
          char nameUsed[512]={0};
