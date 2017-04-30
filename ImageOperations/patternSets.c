@@ -8,6 +8,17 @@
 #define DUMP_PATTERN_FAILED_PATCHES 1
 
 
+
+#define NORMAL   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE "\033[37m" /* White */
+
 int patFileExists(char * filename)
 {
   if (filename==0) { return 0; }
@@ -39,12 +50,13 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
   while (i<255)
   {
       snprintf(fName,512,"%s%u.pnm",name,i);
+      //fprintf(stderr,"Trying to load #%u -> %s \n",i,fName);
       if (patFileExists(fName))
       {
         set->pattern[curSetNum].tile[totalTiles] = readImage( fName , PNM_CODEC , 0 );
         if (set->pattern[curSetNum].tile[totalTiles]!=0)
         {
-          fprintf(stderr,"Loaded %s , we now have %u patterns for set %u\n",fName, totalTiles , curSetNum);
+          fprintf(stderr,GREEN "Loaded %s , we now have %u patterns for set %u\n" NORMAL,fName, totalTiles , curSetNum);
 
           unsigned int totalPixels = set->pattern[curSetNum].tile[totalTiles]->width * set->pattern[curSetNum].tile[totalTiles]->height;
           unsigned int transPixels =  countOccurancesOfRGBPixel(set->pattern[curSetNum].tile[totalTiles]->pixels,
@@ -59,6 +71,7 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
         }
       } else
       {
+        if (i==1) { fprintf(stderr,RED "Failed to load any files for #%u -> %s \n" NORMAL,i,fName); }
         set->pattern[curSetNum].totalTiles=totalTiles ;
         break;
       }
@@ -67,7 +80,8 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
   }
   return 1;
 }
-#define DUMP_LOADED_PATTERN_SET 1
+
+
 int dumpPatternSet(struct PatternSet * pattSet ,char * stage)
 {
  #if !DUMP_LOADED_PATTERN_SET
