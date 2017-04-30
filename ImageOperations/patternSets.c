@@ -67,7 +67,7 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
   }
   return 1;
 }
-
+#define DUMP_LOADED_PATTERN_SET 1
 int dumpPatternSet(struct PatternSet * pattSet ,char * stage)
 {
  #if !DUMP_LOADED_PATTERN_SET
@@ -80,12 +80,21 @@ int dumpPatternSet(struct PatternSet * pattSet ,char * stage)
  char fName[512];
  for ( patternNum=0;    patternNum < pattSet->totalPatterns;    patternNum++ )
  {
-   fprintf(stderr,"Dumping %s %s\n",stage,pattSet->pattern[patternNum].name);
-   for ( tileNum=0;      tileNum < pattSet->pattern[patternNum].totalTiles;     tileNum++ )
+   fprintf(stderr,"Dumping %s %s :  ",stage,pattSet->pattern[patternNum].name);
+   if (pattSet->pattern[patternNum].totalTiles==0)
    {
-        sprintf(fName,"Dump/%sPattern%uTile%u.pnm",stage,patternNum,tileNum);
+    fprintf(stderr,"EMPTY");
+   } else
+   {
+     for ( tileNum=0;      tileNum < pattSet->pattern[patternNum].totalTiles;     tileNum++ )
+      {
+        snprintf(fName,512,"Dump/%sPattern%uTile%u.pnm",stage,patternNum,tileNum);
+        fprintf(stderr,"%s ",fName);
         writeImageFile(pattSet->pattern[patternNum].tile[tileNum],PNM_CODEC,fName);
+      }
    }
+   fprintf(stderr,"\n");
+
   }
 }
 

@@ -33,15 +33,16 @@ int initializeSeeingPicks()
    snprintf(heroPath,128,"tiles/%s_s.pnm",dota2InternalHeroNames[i]);
    addToPatternSet(&selectionSet,heroPath,i,MAXIMUM_ACCEPTED_SCORE);
   }
-
+  dumpPatternSet(&selectionSet,"selections");
 
  for (i=0; i<d2_number_of_heroes; i++)
   {
    snprintf(heroPath,128,"tiles/%s_p.pnm",dota2InternalHeroNames[i]);
    addToPatternSet(&pickedSet,heroPath,i,MAXIMUM_ACCEPTED_SCORE);
   }
+  dumpPatternSet(&pickedSet,"picks");
 
-
+ exit(0);
 
  return 1;
 }
