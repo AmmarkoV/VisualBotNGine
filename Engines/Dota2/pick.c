@@ -9,7 +9,13 @@
 #include "../../Codecs/codecs.h"
 
 
-#define MAXIMUM_ACCEPTED_SCORE 200000
+
+#define NORMAL   "\033[0m"
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
+#define MAXIMUM_ACCEPTED_SCORE 30000
 
 // 96x67
 // RADIANT 175 299 423 547 672 DIRE 1156 1276 1400 1524 1648
@@ -33,16 +39,16 @@ int initializeSeeingPicks()
    snprintf(heroPath,128,"tiles/%s_s",dota2InternalHeroNames[i]);
    addToPatternSet(&selectionSet,heroPath,i,MAXIMUM_ACCEPTED_SCORE);
   }
-  dumpPatternSet(&selectionSet,"selections");
+ //dumpPatternSet(&selectionSet,"selections");
 
  for (i=0; i<d2_number_of_heroes; i++)
   {
    snprintf(heroPath,128,"tiles/%s_p",dota2InternalHeroNames[i]);
    addToPatternSet(&pickedSet,heroPath,i,MAXIMUM_ACCEPTED_SCORE);
   }
-  dumpPatternSet(&pickedSet,"picks");
+ //dumpPatternSet(&pickedSet,"picks");
 
- exit(0);
+ //exit(0);
 
  return 1;
 }
@@ -69,7 +75,7 @@ int compareTableTile(struct PatternSet * pattSet ,
    }
 */
 
-  fprintf(stderr,"\ncompareTableTile called \n");
+  //fprintf(stderr,"\ncompareTableTile called \n");
 
    if (
         compareToPatternSet( pattSet ,
@@ -112,13 +118,33 @@ int isPickEmpty(unsigned int pid , struct pickScreen * picks , struct Image * vi
                               );
 
   fprintf(stderr,"pick%u empty score %u :  ",pid,currentScore);
-  if (currentScore<190000) { fprintf(stderr,"EMPTY\n"); return 1;}
+  if (currentScore<190000) { fprintf(stderr,RED "EMPTY\n" NORMAL); return 1;}
 
   return 0;
 }
 
 
+int printPicks(struct teams * team )
+{
+   unsigned int i=0;
+  fprintf(stderr,"\n\n\n\nRadiant : ");
+  for (i=0; i<5; i++)
+  {
+    if (team->playersPicked[i]==0)  { fprintf(stderr,RED "none " NORMAL); } else
+    if (team->playersPicked[i]==1)  { fprintf(stderr,YELLOW "%s " NORMAL,dota2InternalHeroNames[team->playersHeroes[i]]); } else
+    if (team->playersPicked[i]==2)  { fprintf(stderr,GREEN "%s " NORMAL,dota2InternalHeroNames[team->playersHeroes[i]]); }
+  }
 
+  fprintf(stderr,"\nDire : ");
+  for (i=5; i<10; i++)
+  {
+    if (team->playersPicked[i]==0)  { fprintf(stderr,RED "none " NORMAL); }else
+    if (team->playersPicked[i]==1)  { fprintf(stderr,YELLOW "%s " NORMAL,dota2InternalHeroNames[team->playersHeroes[i]]); } else
+    if (team->playersPicked[i]==2)  { fprintf(stderr,GREEN "%s " NORMAL,dota2InternalHeroNames[team->playersHeroes[i]]); }
+  }
+
+  fprintf(stderr,"\n\n\n\n");
+}
 
 
 

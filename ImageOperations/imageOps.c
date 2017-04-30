@@ -510,11 +510,11 @@ int bitBltRGBToFile(  char * name  , char * comment ,
  unsigned char * tile = (unsigned char*) malloc((width+1)*(height+1)*3*sizeof(unsigned char));
  if (tile == 0 ) { return 0; }
 
- fprintf(stderr," Doing bitbltRGB %ux%u\n",width,height);
+ //fprintf(stderr," Doing bitbltRGB %ux%u\n",width,height);
  bitbltRGB(tile,0,0,width,height,source,sX,sY,sourceWidth,sourceHeight,width, height);
 
 
- fprintf(stderr," saveRawImageToFile %ux%u \n",width,height);
+ //fprintf(stderr," saveRawImageToFile %ux%u \n",width,height);
  if ( ! saveRawImageToFile(filename ,comment,tile , width , height, 3 , 8) )
  {
      fprintf(stderr,"Could not bit blt to File %s\n",name);

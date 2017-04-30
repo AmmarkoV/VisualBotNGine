@@ -200,6 +200,7 @@ int main(int argc, char *argv[])
       haystack = reloadScreen(haystack);
 
       seePicks(&currentSelections,haystack);
+      printPicks(&currentSelections);
 
     }
 

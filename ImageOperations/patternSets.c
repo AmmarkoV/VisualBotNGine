@@ -5,7 +5,7 @@
 #include "../Codecs/codecs.h"
 
 
-#define DUMP_PATTERN_FAILED_PATCHES 1
+#define DUMP_PATTERN_FAILED_PATCHES 0
 
 
 
@@ -149,9 +149,9 @@ int compareToPatternSet(struct PatternSet * pattSet ,
                         unsigned int * resultTileNum
                         )
 {
-  fprintf(stderr,"compareToPatternSet(screen,%u,%u,",screenWidth,screenHeight);
-  fprintf(stderr,"sX=%u,sY=%u,width=%u,height=%u,",sX,sY,width,height);
-  fprintf(stderr,"maxScore=%u)\n",maximumAcceptedScore);
+  //fprintf(stderr,"compareToPatternSet(screen,%u,%u,",screenWidth,screenHeight);
+  //fprintf(stderr,"sX=%u,sY=%u,width=%u,height=%u,",sX,sY,width,height);
+  //fprintf(stderr,"maxScore=%u)\n",maximumAcceptedScore);
 
   unsigned int currentScore=maximumAcceptedScore+1;
   unsigned int bestScore=maximumAcceptedScore+1;
@@ -163,19 +163,19 @@ int compareToPatternSet(struct PatternSet * pattSet ,
   unsigned int tileNum=0;
   unsigned int patternNum=0;
 
-  fprintf(stderr,"Will work on a pattern set with %u Patterns\n",pattSet->totalPatterns);
+  //fprintf(stderr,"Will work on a pattern set with %u Patterns\n",pattSet->totalPatterns);
   for ( patternNum=0;    patternNum < pattSet->totalPatterns;    patternNum++ )
   {
 
 
    if (pattSet->pattern[patternNum].totalTiles>0)
    {
-    fprintf(stderr," Pattern set %u has %u tiles\n",patternNum,pattSet->pattern[patternNum].totalTiles);
+    //fprintf(stderr," Pattern set %u has %u tiles\n",patternNum,pattSet->pattern[patternNum].totalTiles);
     for ( tileNum=0;      tileNum < pattSet->pattern[patternNum].totalTiles;     tileNum++ )
     {
        currentScore=maximumAcceptedScore+1;
 
-       fprintf(stderr," pattern %u / tile %u \n",patternNum,tileNum);
+       //fprintf(stderr," pattern %u / tile %u \n",patternNum,tileNum);
        if (
             compareRGBPatchesIgnoreColor(
                                          /*Main Image*/

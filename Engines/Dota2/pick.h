@@ -23,6 +23,7 @@ struct teams
 
 
 int initializeSeeingPicks();
+int printPicks(struct teams * team );
 int seePicks(  struct teams * team ,struct Image * view);
 
 #endif // PICK_H_INCLUDED
