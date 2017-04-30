@@ -38,7 +38,7 @@ int addToPatternSet(struct PatternSet * set , char * name , unsigned int value ,
   unsigned int totalTiles = 0;
   while (i<255)
   {
-      sprintf(fName,"%s%u.pnm",name,i);
+      snprintf(fName,512,"%s%u.pnm",name,i);
       if (patFileExists(fName))
       {
         set->pattern[curSetNum].tile[totalTiles] = readImage( fName , PNM_CODEC , 0 );
