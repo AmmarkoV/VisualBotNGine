@@ -159,6 +159,9 @@ int seePicks(struct teams * team ,struct Image * view)
         )
         {
           fprintf(stderr,"Selected[%u] got assigned via tiles\n",i);
+          if (team->playersPicked==0)
+            { saySomethingInDota2("Player %u highlighted a selection of hero %u ",team->playersHeroes[i]); }
+
           team->playersPicked[i]=1;
         }
         else
@@ -174,6 +177,8 @@ int seePicks(struct teams * team ,struct Image * view)
         )
         {
           fprintf(stderr,"Picked[%u] got assigned via tiles\n",i);
+          if (team->playersPicked==0)
+            { saySomethingInDota2("Player %u picked a selection of hero %u ",team->playersHeroes[i]); }
           team->playersPicked[i]=2;
         }
         else
