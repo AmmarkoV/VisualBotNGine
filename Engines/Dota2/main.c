@@ -187,7 +187,8 @@ int main(int argc, char *argv[])
 
     initializeSeeingPicks();
 
-    saySomethingInDota2("Trying to analyze the situation..");
+    //saySomethingInDota2("glhf team , let's do this");
+    //saySomethingInDota2("Trying to analyze the situation..");
 
     resX = oX+175 , resY = oY+109;
     while (1)

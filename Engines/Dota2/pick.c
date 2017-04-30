@@ -67,6 +67,9 @@ int compareTableTile(struct PatternSet * pattSet ,
        return 1;
    }
 */
+
+  fprintf(stderr,"\ncompareTableTile called \n");
+
    if (
         compareToPatternSet( pattSet ,
                              screen , screenWidth , screenHeight ,

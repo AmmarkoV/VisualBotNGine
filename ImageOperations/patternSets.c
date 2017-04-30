@@ -4,6 +4,9 @@
 #include "../Codecs/codecs.h"
 
 
+#define DUMP_PATTERN_FAILED_PATCHES 1
+
+
 int patFileExists(char * filename)
 {
   if (filename==0) { return 0; }
@@ -104,7 +107,12 @@ int emptyPatternSet(struct PatternSet * pattSet)
 
 unsigned int getPatternSetItemWidth(struct PatternSet * pattSet  , unsigned int patternNum , unsigned int tileNum)
 {
-    return pattSet->pattern[patternNum].tile[tileNum]->width ;
+    if (patternNum<pattSet->totalPatterns)
+    {
+      return pattSet->pattern[patternNum].tile[tileNum]->width;
+    }
+ fprintf(stderr,"getPatternSetItemWidth asking for out of bounds pattern ( number %u / %u ) ",patternNum,pattSet->totalPatterns);
+ return 0;
 }
 
 
