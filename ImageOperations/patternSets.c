@@ -135,6 +135,7 @@ int compareToPatternSet(struct PatternSet * pattSet ,
   unsigned int bestPick=0;
   unsigned int bestPattern=0;
   unsigned int bestTile=0;
+  unsigned int bestCandidates=0;
 
   unsigned int tileNum=0;
   unsigned int patternNum=0;
@@ -181,6 +182,7 @@ int compareToPatternSet(struct PatternSet * pattSet ,
          bestPick = pattSet->pattern[patternNum].value;
          bestPattern=patternNum;
          bestTile=tileNum;
+         ++bestCandidates;
        }
       }
      }
@@ -197,18 +199,21 @@ int compareToPatternSet(struct PatternSet * pattSet ,
     }
  }
 
+
+  fprintf(stderr,"Thinking about best score\n",pattSet->totalPatterns);
+
    if (bestScore < maximumAcceptedScore )
     {
          unsigned int x=0,y=0;
          char comment[512]={0};
          char nameUsed[512]={0};
-         sprintf(nameUsed,"Dump/tile%u_%u_like_%u_%u_score_%u",x,y,bestPattern,bestTile,bestScore);
-         sprintf(comment,"Most like  %u   with score %u", bestPick,bestScore);
+         snprintf(nameUsed,512,"Dump/tile%u_%u_like_%u_%u_score_%u",x,y,bestPattern,bestTile,bestScore);
+         snprintf(comment,512,"Most like  %u   with score %u", bestPick,bestScore);
          bitBltRGBToFile(  nameUsed ,
                            comment,
                            screen , sX ,  sY , screenWidth, screenHeight, width, height );
 
-         sprintf(nameUsed,"Dump/tile%u_%u_like_%u_%u_score_%uB",x,y,bestPattern,bestTile,bestScore);
+         snprintf(nameUsed,512,"Dump/tile%u_%u_like_%u_%u_score_%uB",x,y,bestPattern,bestTile,bestScore);
          bitBltRGBToFile(  nameUsed , comment,
                            pattSet->pattern[bestPattern].tile[bestTile]->pixels ,
                            0 ,  0
@@ -228,21 +233,28 @@ int compareToPatternSet(struct PatternSet * pattSet ,
 
 
         #if DUMP_PATTERN_FAILED_PATCHES
+         fprintf(stderr,"Doing DUMP_PATTERN_FAILED_PATCHES \n");
          unsigned int x=0,y=0;
          char comment[512]={0};
          char nameUsed[512]={0};
-         sprintf(nameUsed,"Dump/tile%u_%u_like_%u_%u_score_%u",x,y,bestPattern,bestTile,bestScore);
-         sprintf(comment,"Most like  %u   with score %u", bestPick,bestScore);
-         bitBltRGBToFile(  nameUsed ,
-                           comment,
-                           screen , sX ,  sY , screenWidth, screenHeight, width, height );
-
-         sprintf(nameUsed,"Dump/tile%u_%u_like_%u_%u_score_%uB",x,y,bestPattern,bestTile,bestScore);
+         snprintf(nameUsed,512,"Dump/tile%u_%u_like_%u_%u_score_%u",x,y,bestPattern,bestTile,bestScore);
+         snprintf(comment,512,"Most like  %u   with score %u", bestPick,bestScore);
          bitBltRGBToFile(  nameUsed , comment,
-                           pattSet->pattern[bestPattern].tile[bestTile]->pixels ,
-                           0 ,  0
-                           , pattSet->pattern[bestPattern].tile[bestTile]->width , pattSet->pattern[bestPattern].tile[bestTile]->height
-                           , pattSet->pattern[bestPattern].tile[bestTile]->width , pattSet->pattern[bestPattern].tile[bestTile]->height );
+                           screen ,
+                           sX ,  sY ,
+                           screenWidth, screenHeight, width, height );
+
+         if (bestCandidates>0)
+         {
+          snprintf(nameUsed,512,"Dump/tile%u_%u_like_%u_%u_score_%uB",x,y,bestPattern,bestTile,bestScore);
+          fprintf(stderr,"Best Pattern is %u \n",bestPattern);
+          fprintf(stderr,"Best Tile is %u \n",bestTile);
+          bitBltRGBToFile(  nameUsed , comment,
+                            pattSet->pattern[bestPattern].tile[bestTile]->pixels ,
+                            0 ,  0
+                            , pattSet->pattern[bestPattern].tile[bestTile]->width , pattSet->pattern[bestPattern].tile[bestTile]->height
+                            , pattSet->pattern[bestPattern].tile[bestTile]->width , pattSet->pattern[bestPattern].tile[bestTile]->height );
+         }
         #endif // DUMP_PATCHES
 
  return 0;
